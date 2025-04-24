@@ -4,31 +4,43 @@ package com.snackstack.server.service;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.dto.UserDTO;
 import java.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserService {
 
   private final UserDAO dao;
+  private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-  public UserService(UserDAO dao) { this.dao = dao; }
+  public UserService(UserDAO dao) {
+    this.dao = dao;
+    logger.debug("UserService initialized");
+  }
 
   public long createUser(UserDTO req) {
-    try{
+    try {
+      logger.info("Creating new user with username: {}", req.userName());
       // 1. uniqueness format checks (omitted, maybe will implement later idk)
       // 2. get current time instant
       Instant now = Instant.now();
       // 3. delegate to DAO
-      return dao.insert(req.userName(), req.email(), now, now);
+      long userId = dao.insert(req.userName(), req.email(), now, now);
+      logger.info("Successfully created user with ID: {}", userId);
+      return userId;
     } catch(Exception e){
-      System.out.println(e);
+      logger.error("Error creating user: {}", req.userName(), e);
       throw e;
     }
   }
 
   public int deleteUserByName(UserDTO req) {
-    try{
-      return dao.deleteByName(req.userName());
+    try {
+      logger.info("Deleting user with username: {}", req.userName());
+      int rowsAffected = dao.deleteByName(req.userName());
+      logger.info("Delete user operation affected {} rows", rowsAffected);
+      return rowsAffected;
     } catch(Exception e){
-      System.out.println(e);
+      logger.error("Error deleting user: {}", req.userName(), e);
       throw e;
     }
   }
