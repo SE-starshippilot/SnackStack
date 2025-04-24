@@ -22,7 +22,7 @@ public final class UserController {
         return gson.toJson(new IdResponse(id));
       });
 
-      /* ---- DELETE /api/users/:id ----  (delete) */
+      /* ---- DELETE /api/users/:name ----  (delete) */
       delete("/:name", (req, res) -> {
         boolean ok = dao.deleteByName(req.params(":name")) == 1;     // rows affected
         if (!ok) { halt(404, "User not found"); }
@@ -33,6 +33,5 @@ public final class UserController {
   }
 
   /* small DTOs local to controller layer */
-  private record UserCreateReq(String userName, String email) {}
   private record IdResponse(long id) {}
 }

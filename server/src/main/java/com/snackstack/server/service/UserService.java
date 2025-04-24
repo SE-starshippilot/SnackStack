@@ -22,6 +22,14 @@ public class UserService {
       System.out.println(e);
       throw e;
     }
+  }
 
+  public int deleteUserByName(UserDTO req) {
+    try{
+      return dao.deleteByName(req.userName());
+    } catch(Exception e){
+      System.out.println(e);
+      throw e;
+    }
   }
 }
