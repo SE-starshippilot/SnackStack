@@ -10,7 +10,7 @@ import org.jdbi.v3.sqlobject.statement.*;
 @RegisterBeanMapper(User.class)
 public interface UserDAO {
   /* CREATE: Create a new user */
-  @SqlUpdate("""
+  @SqlQuery("""
       INSERT INTO users(userName, email, createdAt, lastLoginAt)
       VALUES (:userName, :email, :createdAt, :lastLoginAt)
       RETURNING userID
