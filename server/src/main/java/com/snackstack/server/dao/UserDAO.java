@@ -9,11 +9,12 @@ import org.jdbi.v3.sqlobject.statement.*;
 
 @RegisterBeanMapper(User.class)
 public interface UserDAO {
+
   /* CREATE: Create a new user */
   @SqlQuery("""
-      INSERT INTO users(userName, email, createdAt, lastLoginAt)
+      INSERT INTO users(user_name, email, created_at, last_login_at)
       VALUES (:userName, :email, :createdAt, :lastLoginAt)
-      RETURNING userID
+      RETURNING user_id
       """)
   Integer insert(
       @Bind("userName") String userName,
@@ -23,10 +24,17 @@ public interface UserDAO {
   );
 
   /* READ: fetch a user */
-  @SqlQuery("SELECT * FROM users WHERE userName = :userName")
+  @SqlQuery("""
+      SELECT *
+      FROM users
+      WHERE user_name = :userName
+      """)
   Optional<User> findByUsername(@Bind("userName") String username);
 
   /* DELETE: remove a user */
-  @SqlUpdate("DELETE FROM users WHERE userName = :userName")
+  @SqlUpdate("""
+      DELETE FROM users
+      WHERE userName = :userName
+      """)
   int deleteByName(@Bind("userName") String userName);
 }
