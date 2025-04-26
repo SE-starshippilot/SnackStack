@@ -191,7 +191,9 @@ function RecipeGeneration() {
                 max={10}
                 color={errors.servings ? "error" : "success"}
               />
-              <Typography>{formData.servings}</Typography>
+              <Typography data-testid="serving-value">
+                {formData.servings}
+              </Typography>
             </Box>
           </div>
 
@@ -262,6 +264,7 @@ function RecipeGeneration() {
               <Button
                 variant="outlined"
                 color="success"
+                aria-label="add-preference"
                 onClick={() =>
                   handleAddChip(
                     preferenceInput,
@@ -321,6 +324,7 @@ function RecipeGeneration() {
               <Button
                 variant="outlined"
                 color="success"
+                aria-label="add-allergy"
                 onClick={() =>
                   handleAddChip(
                     allergyInput,
