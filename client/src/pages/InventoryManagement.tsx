@@ -58,6 +58,7 @@ function InventoryManagement() {
                     sx={{ marginRight: 2 }}
                 />
                 <Button
+                    aria-label="add-btn"
                     variant="contained"
                     color="primary"
                     onClick={handleConfirmClick}
@@ -112,6 +113,7 @@ function InventoryManagement() {
                 {/* Delete button for clicked items */}
                 <Box sx={{ marginTop: 2 }}>
                     <Button
+                        aria-label="delete-btn"
                         variant="contained"
                         color="primary"
                         onClick={handleDeleteItems}
@@ -124,6 +126,7 @@ function InventoryManagement() {
                 {/* Done button will bring users back to the home page */}
                 <Box sx={{ marginTop: 2 }}>
                     <Button
+                        aria-label="done-btn"
                         variant="contained"
                         color="secondary"
                         onClick={handleDoneClick}
