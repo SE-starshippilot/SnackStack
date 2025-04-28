@@ -26,7 +26,7 @@ function App() {
         <div className="auth-controls">
         <SignedOut>
         <SignInButton mode="modal">
-                <button className="auth-button">Sign In</button>
+              <button className="auth-button">Sign In</button>
               </SignInButton>
             </SignedOut>
 
@@ -38,7 +38,6 @@ function App() {
             </SignedIn>
           </div>
         </header>
-
 
         <div className="main-content">
           <Routes>

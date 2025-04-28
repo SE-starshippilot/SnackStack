@@ -1,4 +1,4 @@
-// components/CompleteProfile.tsx
+// components/Profile.tsx
 import { useUser, RedirectToSignIn } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,13 +9,13 @@ export default function Profile() {
   const [lastName,  setLastName]  = useState("");
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     if (isLoaded && user) {
-        setFirstName(user.firstName || "");
-        setLastName(user.lastName || "");
-      
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName   || "");
     }
-  }, [isLoaded, user, navigate]);
+  }, [isLoaded, user]);
 
   if (!isLoaded) return null;
   if (!user) return <RedirectToSignIn />;
@@ -27,28 +27,30 @@ export default function Profile() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "2rem auto" }}>
+    <div className="profile-container">
       <h2>Complete Your Profile</h2>
-      <form onSubmit={onSave}>
+      <form onSubmit={onSave} className="profile-form">
         <label>
           First Name
-          <input
+        <input
+            type="text"
             value={firstName}
             onChange={e => setFirstName(e.target.value)}
             required
           />
         </label>
-        <label style={{ marginTop: 12 }}>
-          Last Name
+
+        <label>
+        Last Name
           <input
+            type="text"
             value={lastName}
             onChange={e => setLastName(e.target.value)}
             required
           />
         </label>
-        <button type="submit" style={{ marginTop: 16 }}>
-          Save & Continue
-        </button>
+
+        <button type="submit">Save &amp; Continue</button>
       </form>
     </div>
   );
