@@ -18,3 +18,4 @@ You must add a Clerk publishable key before running locally
 cp .env.example .env.local
 2) Replace the place holder with your own value (VITE_CLERK_PUBLISHABLE_KEY=pk_XXXXXXXXXXXXXXXXXXXX)
 You can use your own, or you are also welcome to use mine (VITE_CLERK_PUBLISHABLE_KEY=pk_test_YW1wbGUtZmVycmV0LTIzLmNsZXJrLmFjY291bnRzLmRldiQ)
+3) For testing purposes skip Clerk authentication by adding this line to your .env.local VITE_DISABLE_AUTH=true
