@@ -78,3 +78,37 @@ body {
     gap: 16px;
   }
 }
+
+/* wrap Navbar + auth controls in one row */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  /*  navbar styling */
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 16px 20px;
+}
+
+/* container for sign-in / sign-out */
+.auth-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* style buttons */
+.auth-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 8px;
+}
+.auth-button:hover {
+  color: #10b981;
+}
