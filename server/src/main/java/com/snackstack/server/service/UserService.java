@@ -3,7 +3,9 @@ package com.snackstack.server.service;
 
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.dto.UserDTO;
+import com.snackstack.server.exceptions.RecordNotFound;
 import java.time.Instant;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,7 @@ public class UserService {
       long userId = dao.insert(req.userName(), req.email(), now, now);
       logger.info("Successfully created user with ID: {}", userId);
       return userId;
-    } catch(Exception e){
+    } catch (Exception e) {
       logger.error("Error creating user: {}", req.userName(), e);
       throw e;
     }
@@ -39,8 +41,23 @@ public class UserService {
       int rowsAffected = dao.deleteByName(req.userName());
       logger.info("Delete user operation affected {} rows", rowsAffected);
       return rowsAffected;
-    } catch(Exception e){
+    } catch (Exception e) {
       logger.error("Error deleting user: {}", req.userName(), e);
+      throw e;
+    }
+  }
+
+  public long getUserIdByName(String userName) {
+    try {
+      logger.info("Searching user with username: {}", userName);
+      Optional<Integer> uid = dao.getUserIdByName(userName);
+      if (uid.isPresent()) {
+        return uid.get();
+      } else {
+        throw new RecordNotFound("User not found");
+      }
+    } catch (Exception e) {
+      logger.error("Error searching user: {}", userName, e);
       throw e;
     }
   }

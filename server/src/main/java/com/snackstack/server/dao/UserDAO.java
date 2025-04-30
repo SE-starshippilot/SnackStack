@@ -25,16 +25,16 @@ public interface UserDAO {
 
   /* READ: fetch a user */
   @SqlQuery("""
-      SELECT *
+      SELECT user_id
       FROM users
       WHERE user_name = :userName
       """)
-  Optional<User> findByUsername(@Bind("userName") String username);
+  Optional<Integer> getUserIdByName(@Bind("userName") String username);
 
   /* DELETE: remove a user */
   @SqlUpdate("""
       DELETE FROM users
-      WHERE userName = :userName
+      WHERE user_name = :userName
       """)
   int deleteByName(@Bind("userName") String userName);
 }

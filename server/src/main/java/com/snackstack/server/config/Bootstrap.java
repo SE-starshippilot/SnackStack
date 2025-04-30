@@ -1,8 +1,11 @@
 package com.snackstack.server.config;
 
 import com.google.gson.Gson;
+import com.snackstack.server.controller.InventoryController;
 import com.snackstack.server.controller.UserController;
+import com.snackstack.server.dao.InventoryDAO;
 import com.snackstack.server.dao.UserDAO;
+import com.snackstack.server.service.InventoryService;
 import com.snackstack.server.service.UserService;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -39,10 +42,13 @@ public final class Bootstrap {
 
       logger.info("Initializing DAO and service layers");
       UserDAO userDAO = jdbi.onDemand(UserDAO.class);
+      InventoryDAO inventoryDAO = jdbi.onDemand(InventoryDAO.class);
       UserService userService = new UserService(userDAO);
+      InventoryService inventoryService = new InventoryService(userDAO, inventoryDAO);
 
       logger.info("Registering controller routes");
       UserController.registerRoutes(userDAO, userService, gson);
+      InventoryController.registerRoutes(inventoryService, gson);
 
       logger.info("Application initialization completed successfully");
     } catch (Exception e) {
