@@ -1,2 +1,2 @@
 # SnackStack
-Brown CS0320 Group Final Project: an application that help users track inventory and recommend recipe
+Brown CS0320 Group Final Project: an application that helps users track inventory and recommend recipes
