@@ -22,48 +22,43 @@ function App() {
   return (
     <Router>
       <div className="container">
-      <header className="header">
-        <Navbar />
-
-      {!disableAuth && (
-        <div className="auth-controls">
-        <SignedOut>
-        <SignInButton mode="modal">
-              <button className="auth-button">Sign In</button>
-              </SignInButton>
-            </SignedOut>
-
-            <SignedIn>
-            <UserButton />{" "}
-            <SignOutButton>
-                <button className="auth-button">Sign Out</button>
-              </SignOutButton>
-            </SignedIn>
-          </div>
-      )}
+        {/* only render Navbar; it now handles auth-controls itself */}
+        <header className="header">
+          <Navbar disableAuth={disableAuth} />
         </header>
 
         <div className="main-content">
           <Routes>
             {!disableAuth && (
-            <Route path="/complete-profile" element={<Profile />} />
+              <Route path="/complete-profile" element={<Profile />} />
             )}
             <Route path="/" element={<Home />} />
-            <Route path="/inventory" element={
-              disableAuth ? (
-              <InventoryManagement />
-  ) : (
-  <SignedIn>
-    <InventoryManagement />
-  </SignedIn>)} />
 
-            <Route path="/cook" element={
-              disableAuth ? (<RecipeGeneration />
-  ) : (
-    <SignedIn>
-      <RecipeGeneration />
-    </SignedIn>
-  )} />
+            <Route
+              path="/inventory"
+              element={
+                disableAuth ? (
+                  <InventoryManagement />
+                ) : (
+                  <SignedIn>
+                    <InventoryManagement />
+                  </SignedIn>
+                )
+              }
+            />
+
+            <Route
+              path="/cook"
+              element={
+                disableAuth ? (
+                  <RecipeGeneration />
+                ) : (
+                  <SignedIn>
+                    <RecipeGeneration />
+                  </SignedIn>
+                )
+              }
+            />
           </Routes>
         </div>
 

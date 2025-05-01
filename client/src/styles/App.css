@@ -81,9 +81,9 @@ body {
 
 /* wrap Navbar + auth controls in one row */
 .header {
-  display: flex;
+ 
   justify-content: space-between;
-  align-items: center;
+  align-items: center;  
   
   /*  navbar styling */
   background-color: #fff;
@@ -112,6 +112,9 @@ body {
 .auth-button:hover {
   color: #10b981;
 }
+
+
+/* wrap nav-links pushed them to the right */
 
 /* profile completion */
 
@@ -164,4 +167,10 @@ body {
     margin: 2rem 1rem;
     padding: 1.5rem;
   }
+}
+.links-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 24px;       
+  margin-left: auto; 
 }
