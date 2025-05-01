@@ -42,24 +42,23 @@ export const Navbar = ({ disableAuth }: NavbarProps) => {
                 {item.name}
               </Link>
             ))}
+            {!disableAuth && (
+              <div className="auth-controls">
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="auth-button">Sign In</button>
+                  </SignInButton>
+                </SignedOut>
+
+                <SignedIn>
+                  <UserButton />{" "}
+                  <SignOutButton>
+                    <button className="auth-button">Sign Out</button>
+                  </SignOutButton>
+                </SignedIn>
+              </div>
+            )}
           </div>
-
-          {!disableAuth && (
-            <div className="auth-controls">
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <button className="auth-button">Sign In</button>
-                </SignInButton>
-              </SignedOut>
-
-              <SignedIn>
-                <UserButton />{" "}
-                <SignOutButton>
-                  <button className="auth-button">Sign Out</button>
-                </SignOutButton>
-              </SignedIn>
-            </div>
-          )}
         </div>
       </div>
     </nav>
