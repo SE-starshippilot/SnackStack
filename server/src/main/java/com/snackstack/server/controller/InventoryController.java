@@ -10,19 +10,24 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class InventoryController {
+public class InventoryController implements Controller {
 
   private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
+  private final InventoryService service;
+  private final Gson gson;
 
-  /**
-   * Register all inventory routes.
-   *
-   *   • GET    /api/users/:userName/inventory
-   *   • POST   /api/users/:userName/inventory
-   *   • DELETE /api/users/:userName/inventory/:ingredientName
-   */
-  public static void registerRoutes(InventoryService svc, Gson gson) {
+  public InventoryController(InventoryService service, Gson gson) {
+    this.service = service;
+    this.gson = gson;
+  }
 
+  @Override
+  public String getBasePath() {
+    return "/api/users/:userName/inventory";
+  }
+
+  @Override
+  public void registerRoutes() {
     logger.info("Registering Inventory API routes");
 
     /** ---------- Error mapping (RecordNotFound → 404) ---------- */
@@ -32,14 +37,14 @@ public final class InventoryController {
     });
 
     /** ---------- Inventory sub-resource ---------- */
-    path("/api/users/:userName/inventory", () -> {
+    path(getBasePath(), () -> {
 
       /* ---- GET /api/users/{userName}/inventory ---- */
       get("", (req, res) -> {
         String userName = req.params(":userName");
         logger.info("GET inventory for user '{}'", userName);
 
-        List<String> items = svc.getIngredients(userName);
+        List<String> items = service.getIngredients(userName);
         res.status(200);
         return gson.toJson(items);
       });
@@ -51,8 +56,7 @@ public final class InventoryController {
 
         logger.info("POST add ingredient '{}' for user '{}'", body.ingredientName(), userName);
 
-        // (Optional) you might accept quantity/unit in body and pass them to the service later
-        svc.createIngredient(userName, body.ingredientName());
+        service.createIngredient(userName, body.ingredientName());
 
         res.status(201);
         return gson.toJson(new SuccessBody(
@@ -62,17 +66,17 @@ public final class InventoryController {
 
       /* ---- DELETE /api/users/{userName}/inventory/{ingredientName} ---- */
       delete("/:ingredientName", (req, res) -> {
-        String userName       = req.params(":userName");
+        String userName = req.params(":userName");
         String ingredientName = req.params(":ingredientName");
 
         logger.info("DELETE ingredient '{}' for user '{}'", ingredientName, userName);
 
-        int deleted = svc.deleteIngredient(userName, ingredientName);
-        if (deleted == 0) {                    // Shouldn’t occur; svc throws on “user not found”
+        int deleted = service.deleteIngredient(userName, ingredientName);
+        if (deleted == 0) {
           res.status(404);
           return gson.toJson(new ErrorBody("Ingredient not found"));
         }
-        res.status(204);                       // No body on success
+        res.status(204);
         return "";
       });
     });
@@ -81,7 +85,15 @@ public final class InventoryController {
   }
 
   /* ---------- tiny request / response DTOs local to controller ---------- */
-  private record InventoryRequest(String ingredientName) {}
-  private record SuccessBody(String message, String at) {}
-  private record ErrorBody(String error) {}
+  private record InventoryRequest(String ingredientName) {
+
+  }
+
+  private record SuccessBody(String message, String at) {
+
+  }
+
+  private record ErrorBody(String error) {
+
+  }
 }

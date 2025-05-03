@@ -41,5 +41,5 @@ public interface InventoryDAO {
       @Bind("userId") Integer userId,
       @Bind("ingredientName") String ingredientName
   );
-
 }
+//
