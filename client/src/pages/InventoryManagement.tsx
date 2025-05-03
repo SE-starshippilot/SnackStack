@@ -1,5 +1,5 @@
 import { Box, Button, TextField } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/InventoryManagement.css";
 
@@ -9,16 +9,56 @@ function InventoryManagement() {
     const [clickedItems, setClickedItems] = useState<string[]>([]);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchIngredients = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/users/john_doe/inventory");
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const ingredientList: string[] = data;
+                console.log(ingredientList)
+                setIngredients(new Set(ingredientList));
+            } catch (error) {
+                console.error("Failed to fetch ingredients:", error);
+            }
+        };
+    
+        fetchIngredients();
+    }, []);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
 
-    const handleConfirmClick = () => {
+    const handleConfirmClick = async () => {
         const lowerCaseItem = inputValue.toLowerCase();
 
         if (inputValue.trim() !== '' && ![...ingredients].some((ingredient) => ingredient.toLowerCase() === lowerCaseItem)) {
-            setIngredients((prev) => new Set(prev.add(inputValue)));
-            setInputValue('');
+            try {
+                const response = await fetch("http://localhost:8080/api/users/john_doe/inventory", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        ingredientName: inputValue
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+    
+                // update front-end
+                setIngredients((prev) => new Set(prev.add(inputValue)));
+                setInputValue('');
+            } catch(err) {
+                console.error("Failed to add ingredient:", err);
+            }
         }
     };
 
@@ -30,9 +70,29 @@ function InventoryManagement() {
         }
     }
 
-    const handleDeleteItems = () => {
-        setIngredients((prev) => new Set([...prev].filter((item) => !clickedItems.includes(item))));
-        setClickedItems([]);
+    const handleDeleteItems = async () => {
+        try {
+            await Promise.all(
+                clickedItems.map(async (item) => {
+                    const response = await fetch(
+                        `http://localhost:8080/api/users/john_doe/inventory/${encodeURIComponent(item)}`,
+                        {
+                            method: "DELETE"
+                        }
+                    );
+    
+                    if (!response.ok && response.status !== 204) {
+                        throw new Error(`Failed to delete '${item}', status: ${response.status}`);
+                    }
+                })
+            );
+
+            // update front-end state
+            setIngredients((prev) => new Set([...prev].filter((item) => !clickedItems.includes(item))));
+            setClickedItems([]);
+        } catch (err) {
+            console.error("Failed to delete ingredient(s):", err);
+        } 
     }
 
     const handleDoneClick = () => {

@@ -3,10 +3,10 @@ package com.snackstack.server;
 import com.snackstack.server.config.Bootstrap;
 import spark.Spark;
 
-import static spark.Spark.port;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static spark.Spark.*;
 
 public class Server {
 
@@ -38,5 +38,32 @@ public class Server {
       logger.error("Failed to start server", e);
       System.exit(1);
     }
+
+    // 开启 CORS
+    enableCORS("*", "*", "*");
+  }
+
+  private static void enableCORS(final String origin, final String methods, final String headers) {
+    options("/*", (request, response) -> {
+      String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+      if (accessControlRequestHeaders != null) {
+        response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+      }
+
+      String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
+      if (accessControlRequestMethod != null) {
+        response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+      }
+
+      return "OK";
+    });
+
+    before((request, response) -> {
+      response.header("Access-Control-Allow-Origin", origin);
+      response.header("Access-Control-Request-Method", methods);
+      response.header("Access-Control-Allow-Headers", headers);
+      // 如果你有身份认证，可以加上：
+      // response.header("Access-Control-Allow-Credentials", "true");
+    });
   }
 }
