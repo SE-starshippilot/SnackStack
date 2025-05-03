@@ -5,6 +5,7 @@ import Home from "./Home";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import RecipeGeneration from "../pages/RecipeGeneration";
+import RecipesPage from "../pages/RecipesPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/inventory" element={<InventoryManagement />} />
             <Route path="/cook" element={<RecipeGeneration />} />
+            <Route path="/recipes" element={<RecipesPage />} />
           </Routes>
         </div>
         <Footer />

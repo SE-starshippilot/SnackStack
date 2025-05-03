@@ -11,6 +11,7 @@ import {
 import { styled } from "@mui/material/styles";
 import React, { useState } from "react";
 import "../styles/recipeGeneration.css";
+import { useNavigate } from "react-router-dom";
 
 const mealTypes = [
   { id: "main", label: "Main" },
@@ -99,6 +100,12 @@ function RecipeGeneration() {
   const [customAllergies, setCustomAllergies] = useState<string[]>([]);
   const [allergyInput, setAllergyInput] = useState<string>("");
 
+  const navigate = useNavigate();
+
+  const gotoRecipesPage = () => {
+    navigate("/recipes");
+  }
+
   const handleChipToggle = (
     value: string,
     list: string[],
@@ -148,7 +155,9 @@ function RecipeGeneration() {
     setErrors(newErrors);
     if (newErrors.servings || newErrors.mealType) return;
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 3000);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
   };
 
   return (
@@ -237,12 +246,12 @@ function RecipeGeneration() {
                   onDelete={
                     customPreferences.includes(pref)
                       ? () =>
-                          handleDeleteCustom(
-                            pref,
-                            setPreferenceOptions,
-                            setCustomPreferences,
-                            setPreferences
-                          )
+                        handleDeleteCustom(
+                          pref,
+                          setPreferenceOptions,
+                          setCustomPreferences,
+                          setPreferences
+                        )
                       : undefined
                   }
                 />
@@ -301,12 +310,12 @@ function RecipeGeneration() {
                   onDelete={
                     customAllergies.includes(allergy)
                       ? () =>
-                          handleDeleteCustom(
-                            allergy,
-                            setAllergyOptions,
-                            setCustomAllergies,
-                            setAllergies
-                          )
+                        handleDeleteCustom(
+                          allergy,
+                          setAllergyOptions,
+                          setCustomAllergies,
+                          setAllergies
+                        )
                       : undefined
                   }
                 />
@@ -367,6 +376,7 @@ function RecipeGeneration() {
               color="success"
               sx={{ px: 4, py: 1.5, fontWeight: 500 }}
               disabled={isLoading}
+              onClick={gotoRecipesPage}
             >
               {isLoading ? (
                 <CircularProgress size={24} sx={{ color: "#fff" }} />

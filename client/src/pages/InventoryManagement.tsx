@@ -13,20 +13,19 @@ function InventoryManagement() {
         const fetchIngredients = async () => {
             try {
                 const response = await fetch("http://localhost:8080/api/users/john_doe/inventory");
-    
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
                 const ingredientList: string[] = data;
-                console.log(ingredientList)
                 setIngredients(new Set(ingredientList));
             } catch (error) {
                 console.error("Failed to fetch ingredients:", error);
             }
         };
-    
+
         fetchIngredients();
     }, []);
 
@@ -52,11 +51,11 @@ function InventoryManagement() {
                 if (!response.ok) {
                     throw new Error(`Server responded with status ${response.status}`);
                 }
-    
+
                 // update front-end
                 setIngredients((prev) => new Set(prev.add(inputValue)));
                 setInputValue('');
-            } catch(err) {
+            } catch (err) {
                 console.error("Failed to add ingredient:", err);
             }
         }
@@ -80,7 +79,7 @@ function InventoryManagement() {
                             method: "DELETE"
                         }
                     );
-    
+
                     if (!response.ok && response.status !== 204) {
                         throw new Error(`Failed to delete '${item}', status: ${response.status}`);
                     }
@@ -92,7 +91,7 @@ function InventoryManagement() {
             setClickedItems([]);
         } catch (err) {
             console.error("Failed to delete ingredient(s):", err);
-        } 
+        }
     }
 
     const handleDoneClick = () => {
@@ -135,7 +134,7 @@ function InventoryManagement() {
             <Box sx={{
                 margin: 6,
                 display: 'flex',
-                justifyContent: 'center', 
+                justifyContent: 'center',
                 flexWrap: 'wrap'
             }}>
                 {[...ingredients].map((item, index) => (
@@ -167,7 +166,7 @@ function InventoryManagement() {
 
             <Box sx={{
                 marginTop: 10,
-                display: 'flex', 
+                display: 'flex',
                 justifyContent: 'space-around'
             }}>
                 {/* Delete button for clicked items */}
