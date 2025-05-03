@@ -30,13 +30,13 @@ public class InventoryController implements Controller {
   public void registerRoutes() {
     logger.info("Registering Inventory API routes");
 
-    /** ---------- Error mapping (RecordNotFound → 404) ---------- */
+    /* ---------- Error mapping (RecordNotFound → 404) ---------- */
     exception(RecordNotFound.class, (ex, req, res) -> {
       res.status(404);
       res.body(gson.toJson(new ErrorBody(ex.getMessage())));
     });
 
-    /** ---------- Inventory sub-resource ---------- */
+    /* ---------- Inventory sub-resource ---------- */
     path(getBasePath(), () -> {
 
       /* ---- GET /api/users/{userName}/inventory ---- */
