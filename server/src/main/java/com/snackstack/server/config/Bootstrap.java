@@ -7,6 +7,7 @@ import com.snackstack.server.dao.InventoryDAO;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.service.InventoryService;
 import com.snackstack.server.service.UserService;
+import com.snackstack.server.util.DBUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.jdbi.v3.core.Jdbi;
@@ -22,23 +23,9 @@ public final class Bootstrap {
   public static void init() {
     logger.info("Initializing application...");
     try {
-      logger.debug("Loading environment variables");
-      Dotenv dotenv = Dotenv.configure().directory(".").filename(".env").load();
-
-      logger.debug("Configuring database connection pool");
-      HikariConfig cfg = new HikariConfig();
-      cfg.setJdbcUrl(dotenv.get("JDBC_URL"));
-      cfg.setUsername(dotenv.get("JDBC_USERNAME"));
-      // Password intentionally not logged
-      cfg.setPassword(dotenv.get("JDBC_PASSWORD"));
-      HikariDataSource ds = new HikariDataSource(cfg);
-      logger.info("Database connection pool initialized");
-
-      logger.debug("Creating JSON serializer");
       Gson gson = new Gson();
 
-      logger.debug("Setting up JDBI with SQL Object plugin");
-      Jdbi jdbi = Jdbi.create(ds).installPlugin(new SqlObjectPlugin());
+      Jdbi jdbi = DBUtil.getJdbi();
 
       logger.info("Initializing DAO and service layers");
       UserDAO userDAO = jdbi.onDemand(UserDAO.class);
