@@ -17,6 +17,20 @@ test("delete btn is disabled before item was selected", async ({ page }) => {
 });
 
 test("add items", async ({ page }) => {
+    // should be changed to the real username later
+    await page.route('**/api/users/john_doe/inventory', async route => {
+        if (route.request().method() === 'POST') {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ success: true })
+          });
+        } else {
+          route.continue();
+        }
+      });
+
+
     await page.getByRole('textbox', { name: 'add ingredient' }).fill('a');
     await page.getByLabel("add-btn").click();
     await page.getByRole('textbox', { name: 'add ingredient' }).fill('b');
@@ -30,6 +44,18 @@ test("add items", async ({ page }) => {
 });
 
 test("delete btn can be used after item was selected", async ({ page }) => {
+    await page.route('**/api/users/john_doe/inventory', async route => {
+        if (route.request().method() === 'POST') {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ success: true })
+          });
+        } else {
+          route.continue();
+        }
+      });
+
     await page.getByRole('textbox', { name: 'add ingredient' }).fill('a');
     await page.getByLabel("add-btn").click();
     await page.getByRole('textbox', { name: 'add ingredient' }).fill('b');
@@ -43,6 +69,17 @@ test("delete btn can be used after item was selected", async ({ page }) => {
 
     await a.click();
     await b.click();
+
+    // mock DELETE inventory requests. should be changed to real username later
+    await page.route('**/api/users/john_doe/inventory/**', async route => {
+        if (route.request().method() === 'DELETE') {
+          await route.fulfill({
+            status: 204,
+          });
+        } else {
+          route.continue();
+        }
+      });
 
     await page.getByLabel("delete-btn").click();
 

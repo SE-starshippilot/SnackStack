@@ -6,6 +6,10 @@ import "../styles/App.css";
 import { Footer } from "./Footer";
 import Home from "./Home";
 import { Navbar } from "./Navbar";
+import { Footer } from "./Footer";
+import RecipeGeneration from "../pages/RecipeGeneration";
+import RecipesPage from "../pages/RecipesPage";
+
 
 import { SignedIn } from "@clerk/clerk-react";
 
@@ -26,6 +30,7 @@ function App() {
               <Route path="/complete-profile" element={<Profile />} />
             )}
             <Route path="/" element={<Home />} />
+            <Route path="/recipes" element={<RecipesPage />} />
 
             <Route
               path="/inventory"

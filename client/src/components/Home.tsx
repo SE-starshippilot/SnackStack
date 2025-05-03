@@ -99,7 +99,7 @@ function Home() {
               </CardContent>
             </CardActionArea>
           </Card>
-        </Link>
+        </Link> 
       </div>
     </>
   );
