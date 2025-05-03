@@ -347,3 +347,4 @@ pyrightconfig.json
 
 resources/
 *.bkp
+playwright-report
