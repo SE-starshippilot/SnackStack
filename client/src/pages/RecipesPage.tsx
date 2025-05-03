@@ -41,7 +41,10 @@ function RecipesPage() {
             </Typography>
 
             {recipes.map((recipe, index) => (
-                <Card key={index} sx={{ mb: 4, boxShadow: 3 }}>
+                <Card 
+                key={index} 
+                sx={{ mb: 4, boxShadow: 3 }}
+                data-testid={`recipe-card-${index}`}>
                     <CardContent>
                         <Typography variant="h5" fontWeight={600}>
                             {recipe.recipe_name}
@@ -98,6 +101,7 @@ function RecipesPage() {
             ))}
 
             <Button
+                aria-label="recipes-page-back-btn"
                 variant="contained"
                 color="success"
                 sx={{ px: 4, py: 1.5, fontWeight: 500 }}
