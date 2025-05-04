@@ -34,7 +34,7 @@ This would be provided to you in a json. For example,
 }
 ```
 
-Your job is to provide user with a list of possible recipies they can cook given the above information. Use clear, imperative verbs in instructions. You should return a json with at most 3 recipes in a json format with the following fields:
+Your job is to provide user with a list of possible recipes they can cook given the above information. Use clear, imperative verbs in instructions. You should return a json with at most 3 recipes in a json format with the following fields:
 
 1. "success": (bool) whether the generation of recipe is successful or not
 2. "message": (string) if successful, should be "success". Else elaborate why you cannot generate the recipe.
