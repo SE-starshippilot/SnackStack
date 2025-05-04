@@ -42,4 +42,3 @@ public interface InventoryDAO {
       @Bind("ingredientName") String ingredientName
   );
 }
-//
