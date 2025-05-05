@@ -2,12 +2,11 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Profile from "../components/Profile";
 import InventoryManagement from "../pages/InventoryManagement";
 import RecipeGeneration from "../pages/RecipeGeneration";
+import Favorites from "../pages/Favorites";
 import "../styles/App.css";
 import { Footer } from "./Footer";
 import Home from "./Home";
 import { Navbar } from "./Navbar";
-import { Footer } from "./Footer";
-import RecipeGeneration from "../pages/RecipeGeneration";
 import RecipesPage from "../pages/RecipesPage";
 
 
@@ -56,6 +55,19 @@ function App() {
                   </SignedIn>
                 )
               }
+            />
+
+            <Route 
+              path="/favorites" 
+              element={
+              disableAuth ? (
+                <Favorites />
+              ) : (
+                <SignedIn>
+                    <Favorites />
+                </SignedIn>
+                )
+              } 
             />
           </Routes>
         </div>

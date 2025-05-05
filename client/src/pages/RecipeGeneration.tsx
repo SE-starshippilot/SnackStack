@@ -183,6 +183,16 @@ function RecipeGeneration() {
           Based on your preferences, dietary needs, and available ingredients.
         </Typography>
 
+        <Box textAlign="center" mb={3}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => navigate("/favorites")}
+          >
+            See My Favorites
+          </Button>
+        </Box>
+
         <form onSubmit={handleSubmit} className="form-container">
           <div className="form-section">
             <Typography variant="subtitle1" fontWeight={600}>
