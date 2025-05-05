@@ -39,7 +39,7 @@ public class Server {
       System.exit(1);
     }
 
-    // 开启 CORS
+    // enable CORS
     enableCORS("*", "*", "*");
   }
 
@@ -62,7 +62,7 @@ public class Server {
       response.header("Access-Control-Allow-Origin", origin);
       response.header("Access-Control-Request-Method", methods);
       response.header("Access-Control-Allow-Headers", headers);
-      // 如果你有身份认证，可以加上：
+      // add authentication
       // response.header("Access-Control-Allow-Credentials", "true");
     });
   }
