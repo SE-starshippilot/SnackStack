@@ -1,6 +1,6 @@
 package com.snackstack.server;
 
-import com.snackstack.server.config.Bootstrap;
+import com.snackstack.server.config.ApplicationContext;
 import spark.Spark;
 
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import static spark.Spark.*;
 public class Server {
 
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
+  private static ApplicationContext appContext;
 
   public static void main(String[] args) {
     logger.info("Starting Snackstack server application");
@@ -19,8 +20,11 @@ public class Server {
       logger.debug("Setting server port to 8080");
       port(8080);
 
-      logger.info("Initializing application components");
-      Bootstrap.init();
+      logger.info("Initializing application context");
+      appContext = new ApplicationContext();
+
+      logger.info("Registering Controller routes");
+      appContext.registerAllRoutes();
 
       logger.debug("Waiting for server initialization");
       Spark.awaitInitialization();
@@ -32,14 +36,27 @@ public class Server {
         logger.info("Shutdown signal received, stopping server...");
         Spark.stop();
         logger.info("Server stopped");
+        if (appContext != null) {
+          try {
+            appContext.close();
+          } catch (Exception e) {
+            logger.error("Error during application context shutdown", e);
+          }
+        }
       }));
 
     } catch (Exception e) {
       logger.error("Failed to start server", e);
+      if (appContext != null) {
+        try {
+          appContext.close();
+        } catch (Exception ex) {
+          logger.error("Error closing application context after startup failure", ex);
+        }
+      }
       System.exit(1);
     }
 
-    // 开启 CORS
     enableCORS("*", "*", "*");
   }
 
@@ -62,7 +79,7 @@ public class Server {
       response.header("Access-Control-Allow-Origin", origin);
       response.header("Access-Control-Request-Method", methods);
       response.header("Access-Control-Allow-Headers", headers);
-      // 如果你有身份认证，可以加上：
+      // Optional for id verification
       // response.header("Access-Control-Allow-Credentials", "true");
     });
   }
