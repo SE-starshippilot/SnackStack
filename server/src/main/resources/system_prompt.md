@@ -25,7 +25,7 @@ This would be provided to you in a json. For example,
         "peanut butter",
         "flour"
     ],
-    "serving_size": 1,
+    "servings": 1,
     "meal_type": "Meal",
     "meal_origin": ["Italian", "Indian"]
     "allergies": [

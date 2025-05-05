@@ -21,7 +21,7 @@ public class Server {
       port(8080);
 
       logger.info("Initializing application context");
-      appContext = new ApplicationContext();
+      appContext = new ApplicationContext(true);
 
       logger.info("Registering Controller routes");
       appContext.registerAllRoutes();
