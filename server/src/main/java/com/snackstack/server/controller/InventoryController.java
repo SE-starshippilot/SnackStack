@@ -45,9 +45,9 @@ public class InventoryController implements Controller {
         String userName = req.params(":userName");
         logger.info("GET inventory for user '{}'", userName);
 
-        List<InventoryItem> items = service.getIngredients(userName);
+        List<String> itemNames = service.getIngredients(userName);
         res.status(200);
-        return gson.toJson(items);
+        return gson.toJson(itemNames);
       });
 
       /* ---- POST /api/users/{userName}/inventory ---- */
