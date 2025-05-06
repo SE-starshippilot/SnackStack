@@ -7,9 +7,6 @@ import { Footer } from "./Footer";
 import Home from "./Home";
 import { Navbar } from "./Navbar";
 import RecipesPage from "../pages/RecipesPage";
-import RecipeGeneration from "../pages/RecipeGeneration";
-import { Footer } from "./Footer";
-
 
 
 import { SignedIn } from "@clerk/clerk-react";

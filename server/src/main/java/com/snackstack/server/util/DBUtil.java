@@ -11,7 +11,7 @@ public class DBUtil {
     private static Dotenv dotenv;
 
     static {
-        dotenv = Dotenv.configure().directory("server").filename(".env").load();
+        dotenv = Dotenv.configure().filename(".env").load();
 
         if (dotenv.get("JDBC_URL") == null) {
             throw new RuntimeException("Missing JDBC_URL in .env");

@@ -1,12 +1,9 @@
 package com.snackstack.server.config;
 
 import com.google.gson.Gson;
-import com.snackstack.server.controller.InventoryController;
-import com.snackstack.server.controller.UserController;
-import com.snackstack.server.dao.InventoryDAO;
-import com.snackstack.server.dao.UserDAO;
-import com.snackstack.server.service.InventoryService;
-import com.snackstack.server.service.UserService;
+import com.snackstack.server.controller.*;
+import com.snackstack.server.dao.*;
+import com.snackstack.server.service.*;
 import com.snackstack.server.util.DBUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -30,12 +27,26 @@ public final class Bootstrap {
       logger.info("Initializing DAO and service layers");
       UserDAO userDAO = jdbi.onDemand(UserDAO.class);
       InventoryDAO inventoryDAO = jdbi.onDemand(InventoryDAO.class);
+      IngredientDAO ingredientDAO = jdbi.onDemand(IngredientDAO.class);
+      RecipesDAO recipesDAO = jdbi.onDemand(RecipesDAO.class);
+      RecipeIngredientDAO recipeIngredientDAO = jdbi.onDemand(RecipeIngredientDAO.class);
+      RecipeStepsDAO recipeStepsDAO = jdbi.onDemand(RecipeStepsDAO.class);
       UserService userService = new UserService(userDAO);
       InventoryService inventoryService = new InventoryService(userDAO, inventoryDAO);
+      IngredientService ingredientService = new IngredientService(ingredientDAO);
+      RecipesService recipesService = new RecipesService(recipesDAO, recipeIngredientDAO, recipeStepsDAO);
+      RecipeIngredientService recipeIngredientService = new RecipeIngredientService(recipeIngredientDAO);
+      RecipeStepsService recipeStepsService = new RecipeStepsService(recipeStepsDAO);
+
 
       logger.info("Registering controller routes");
       UserController.registerRoutes(userDAO, userService, gson);
       InventoryController.registerRoutes(inventoryService, gson);
+      IngredientController.registerRoutes(ingredientService, gson);
+
+      RecipesController.registerRoutes(recipesService, gson);
+      RecipeIngredientController.registerRoutes(recipeIngredientService, gson);
+      RecipeStepsController.registerRoutes(recipeStepsService, gson);
 
       logger.info("Application initialization completed successfully");
     } catch (Exception e) {

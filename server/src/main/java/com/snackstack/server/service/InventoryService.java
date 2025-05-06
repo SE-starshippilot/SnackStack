@@ -1,5 +1,6 @@
 package com.snackstack.server.service;
 
+import com.snackstack.server.dao.IngredientDAO;
 import com.snackstack.server.dao.InventoryDAO;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.exceptions.RecordNotFound;
@@ -13,6 +14,7 @@ public class InventoryService {
 
   private final UserDAO userDAO;
   private final InventoryDAO inventoryDAO;
+
   private static final Logger logger = LoggerFactory.getLogger(InventoryService.class);
 
   public InventoryService(UserDAO userDAO, InventoryDAO inventoryDAO) {

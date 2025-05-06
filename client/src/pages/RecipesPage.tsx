@@ -22,6 +22,7 @@ import recipesData from "../../data/recipes.json";
 
 function RecipesPage() {
     const [recipes, setRecipes] = useState<any[]>([]);
+    const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
 
     const navigate = useNavigate();
 
@@ -34,6 +35,39 @@ function RecipesPage() {
         navigate("/cook");
     }
 
+    const handleSelectRecipe = (recipeId: number) => {
+        setSelectedRecipeId(recipeId);
+        console.log(selectedRecipeId)
+    };
+
+    const handleConfirmSelection = async () => {
+        try {
+            // find all of the recipe_id that were not chosen by user
+            const unselectedRecipeIds = recipes
+                .filter((r) => r.recipe_id !== selectedRecipeId)
+                .map((r) => r.recipe_id);
+
+            const res = await fetch("/api/recipes", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(unselectedRecipeIds),
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                const selected = recipes.find((r) => r.recipe_id === selectedRecipeId);
+                setRecipes(selected ? [selected] : []);
+            } else {
+                alert("Fail to confirm chosen recipe.");
+            }
+        } catch (err) {
+            console.error("Error confirming recipe:", err);
+        }
+    };
+
+
     return (
         <Container maxWidth="md" sx={{ py: 4 }}>
             <Typography variant="h4" gutterBottom fontWeight={600} textAlign="center">
@@ -41,10 +75,10 @@ function RecipesPage() {
             </Typography>
 
             {recipes.map((recipe, index) => (
-                <Card 
-                key={index} 
-                sx={{ mb: 4, boxShadow: 3 }}
-                data-testid={`recipe-card-${index}`}>
+                <Card
+                    key={index}
+                    sx={{ mb: 4, boxShadow: 3 }}
+                    data-testid={`recipe-card-${index}`}>
                     <CardContent>
                         <Typography variant="h5" fontWeight={600}>
                             {recipe.recipe_name}
@@ -97,18 +131,43 @@ function RecipesPage() {
                             </AccordionDetails>
                         </Accordion>
                     </CardContent>
+                    <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                        <Button
+                            variant={selectedRecipeId === recipe.recipe_id ? "contained" : "outlined"}
+                            color="primary"
+                            onClick={() => handleSelectRecipe(recipe.recipe_id)}
+                            sx={{ mt: 2 }}
+                        >
+                            {selectedRecipeId === recipe.recipe_id ? "Selected" : "Select this recipe"}
+                        </Button>
+                    </Box>
                 </Card>
             ))}
 
-            <Button
-                aria-label="recipes-page-back-btn"
-                variant="contained"
-                color="success"
-                sx={{ px: 4, py: 1.5, fontWeight: 500 }}
-                onClick={backToCookPage}
-            >
-                Back
-            </Button>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Button
+                    aria-label="recipes-page-back-btn"
+                    variant="contained"
+                    color="success"
+                    sx={{ px: 4, py: 1.5, fontWeight: 500 }}
+                    onClick={backToCookPage}
+                >
+                    Back
+                </Button>
+
+                {selectedRecipeId && (
+                    <Button
+                        aria-label="confirm-selection-btn"
+                        variant="contained"
+                        color="secondary"
+                        sx={{ px: 4, py: 1.5, fontWeight: 500 }}
+                        onClick={handleConfirmSelection}
+                    >
+                        Confirm
+                    </Button>
+                )}
+            </Box>
+
         </Container>
     );
 }
