@@ -1,6 +1,5 @@
 package com.snackstack.server.model;
 
-import java.util.List;
 
 
 public record Recipe(
@@ -9,7 +8,8 @@ public record Recipe(
     String description,
     int servings,
     String recipeOrigin,
-    String recipeType
+    String recipeType,
+    boolean is_favorite
 ) {
 
 }
