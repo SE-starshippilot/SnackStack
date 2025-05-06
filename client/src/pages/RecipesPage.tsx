@@ -23,6 +23,7 @@ import recipesData from "../../data/recipes.json";
 function RecipesPage() {
     const [recipes, setRecipes] = useState<any[]>([]);
     const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const navigate = useNavigate();
 
@@ -37,28 +38,29 @@ function RecipesPage() {
 
     const handleSelectRecipe = (recipeId: number) => {
         setSelectedRecipeId(recipeId);
-        console.log(selectedRecipeId)
     };
 
     const handleConfirmSelection = async () => {
         try {
+            console.log(selectedRecipeId);
             // find all of the recipe_id that were not chosen by user
             const unselectedRecipeIds = recipes
                 .filter((r) => r.recipe_id !== selectedRecipeId)
                 .map((r) => r.recipe_id);
 
-            const res = await fetch("/api/recipes", {
+            const res = await fetch("http://localhost:8080/api/recipes", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(unselectedRecipeIds),
+                body: JSON.stringify(unselectedRecipeIds)
             });
 
             const data = await res.json();
-            if (data.success) {
+            if (data.message) {
                 const selected = recipes.find((r) => r.recipe_id === selectedRecipeId);
                 setRecipes(selected ? [selected] : []);
+                setIsSubmitting(true);
             } else {
                 alert("Fail to confirm chosen recipe.");
             }
@@ -162,6 +164,7 @@ function RecipesPage() {
                         color="secondary"
                         sx={{ px: 4, py: 1.5, fontWeight: 500 }}
                         onClick={handleConfirmSelection}
+                        disabled={isSubmitting}
                     >
                         Confirm
                     </Button>
