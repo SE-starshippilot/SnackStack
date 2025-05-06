@@ -1,5 +1,6 @@
 package com.snackstack.server.config;
 
+import com.snackstack.server.service.llm.OllamaRecipeGenerator;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,18 @@ public class AppConfig {
     } catch (RuntimeException e) {
       logger.error("Failed to initialize DBConfig", e);
       throw new RuntimeException("Failed to initialize DBConfig: " + e);
+    }
+  }
+
+  public OllamaConfig configOllama() throws RuntimeException {
+    try {
+      String ollamaHostURL = getField("OLLAMA_URL");
+      String systemPromptPath = getField("SYSTEM_PROMPT_PATH");
+      String ollamaModel = getField("OLLAMA_MODEL");
+      return new OllamaConfig(ollamaHostURL, systemPromptPath, ollamaModel);
+    } catch (Exception e) {
+      logger.error("Failed to config OllamaRecipeGenerator", e);
+      throw new RuntimeException("Failed to initialize OllamaRecipeGenerator: " + e);
     }
   }
 

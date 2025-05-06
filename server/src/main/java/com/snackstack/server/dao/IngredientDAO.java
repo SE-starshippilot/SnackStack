@@ -58,6 +58,13 @@ public interface IngredientDAO {
       """)
   String getIngredientNameById(@Bind("id") long ingredientId);
 
+
+  @SqlQuery("""
+      SELECT ingredient_id
+      FROM ingredients
+      WHERE ingredient_name = :name
+      """)
+  Integer getIngredientIdByName(@Bind("name") String name);
   /**
    * Retrieves multiple ingredients by their IDs.
    *
