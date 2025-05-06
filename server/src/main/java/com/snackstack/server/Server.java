@@ -1,16 +1,19 @@
 package com.snackstack.server;
 
-import com.snackstack.server.config.Bootstrap;
-import spark.Spark;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static spark.Spark.*;
+import com.snackstack.server.config.ApplicationContext;
+
+import spark.Spark;
+import static spark.Spark.before;
+import static spark.Spark.options;
+import static spark.Spark.port;
 
 public class Server {
 
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
+  private static ApplicationContext appContext;
 
   public static void main(String[] args) {
     logger.info("Starting Snackstack server application");
@@ -19,8 +22,11 @@ public class Server {
       logger.debug("Setting server port to 8080");
       port(8080);
 
-      logger.info("Initializing application components");
-      Bootstrap.init();
+      logger.info("Initializing application context");
+      appContext = new ApplicationContext();
+
+      logger.info("Registering Controller routes");
+      appContext.registerAllRoutes();
 
       logger.debug("Waiting for server initialization");
       Spark.awaitInitialization();
@@ -32,10 +38,24 @@ public class Server {
         logger.info("Shutdown signal received, stopping server...");
         Spark.stop();
         logger.info("Server stopped");
+        if (appContext != null) {
+          try {
+            appContext.close();
+          } catch (Exception e) {
+            logger.error("Error during application context shutdown", e);
+          }
+        }
       }));
 
     } catch (Exception e) {
       logger.error("Failed to start server", e);
+      if (appContext != null) {
+        try {
+          appContext.close();
+        } catch (Exception ex) {
+          logger.error("Error closing application context after startup failure", ex);
+        }
+      }
       System.exit(1);
     }
 
@@ -62,7 +82,7 @@ public class Server {
       response.header("Access-Control-Allow-Origin", origin);
       response.header("Access-Control-Request-Method", methods);
       response.header("Access-Control-Allow-Headers", headers);
-      // add authentication
+      // Optional for id verification
       // response.header("Access-Control-Allow-Credentials", "true");
     });
   }

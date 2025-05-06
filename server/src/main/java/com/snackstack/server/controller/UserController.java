@@ -1,4 +1,3 @@
-// controller/UserController.java
 package com.snackstack.server.controller;
 
 import static spark.Spark.*;
@@ -6,24 +5,40 @@ import static spark.Spark.*;
 import com.google.gson.Gson;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.dto.UserDTO;
-import com.snackstack.server.service.UserService;   // business rules
+import com.snackstack.server.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class UserController {
+public class UserController implements Controller {
 
   private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+  private final UserDAO dao;
+  private final UserService service;
+  private final Gson gson;
 
-  public static void registerRoutes(UserDAO dao, UserService svc, Gson gson) {
+  public UserController(UserDAO dao, UserService service, Gson gson) {
+    this.dao = dao;
+    this.service = service;
+    this.gson = gson;
+  }
+
+  @Override
+  public String getBasePath() {
+    return "/api/users";
+  }
+
+  @Override
+  public void registerRoutes() {
     logger.info("Registering User API routes");
-    path("/api/users", () -> {
 
+    path(getBasePath(), () -> {
       /* ---- POST /api/users ----  (create) */
       post("", (req, res) -> {
         logger.info("Received request to create user");
         UserDTO body = gson.fromJson(req.body(), UserDTO.class);
         logger.debug("Request body parsed: username={} email={}", body.userName(), body.email());
-        long id = svc.createUser(body);           // hashes pw, calls dao.insert()
+
+        long id = service.createUser(body);
         res.status(201);
         logger.info("User created successfully with ID: {}", id);
         return gson.toJson(new IdResponse(id));
@@ -44,11 +59,10 @@ public final class UserController {
         return "";
       });
     });
+
     logger.info("User API routes registered successfully");
   }
 
   /* small DTOs local to controller layer */
-  private record IdResponse(long id) {
-
-  }
+  private record IdResponse(long id) {}
 }

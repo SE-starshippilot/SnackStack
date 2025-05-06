@@ -1,10 +1,12 @@
 package com.snackstack.server.util;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class DBUtil {
     private static Jdbi jdbi;
@@ -34,3 +36,4 @@ public class DBUtil {
         return dotenv;
     }
 }
+
