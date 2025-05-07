@@ -28,6 +28,10 @@ public class DBConfig {
     return jdbi;
   }
 
+  public HikariDataSource getDataSource() {
+    return dataSource;
+  }
+
   public void close() {
     if (this.dataSource != null) {
       this.dataSource.close();
