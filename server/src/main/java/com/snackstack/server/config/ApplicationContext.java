@@ -1,15 +1,9 @@
 package com.snackstack.server.config;
 
 import com.google.gson.Gson;
-import com.snackstack.server.controller.Controller;
-import com.snackstack.server.controller.InventoryController;
-import com.snackstack.server.controller.UserController;
-import com.snackstack.server.dao.IngredientDAO;
-import com.snackstack.server.dao.InventoryDAO;
-import com.snackstack.server.dao.UserDAO;
-import com.snackstack.server.service.InventoryService;
-import com.snackstack.server.service.RecipeGenerator;
-import com.snackstack.server.service.UserService;
+import com.snackstack.server.controller.*;
+import com.snackstack.server.dao.*;
+import com.snackstack.server.service.*;
 import com.snackstack.server.service.llm.OllamaRecipeGenerator;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
