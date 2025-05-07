@@ -1,5 +1,6 @@
 import KitchenOutlinedIcon from "@mui/icons-material/KitchenOutlined";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import HistoryIcon from "@mui/icons-material/History";
 import {
   Card,
   CardActionArea,
@@ -46,8 +47,7 @@ function Home() {
                   color="text.secondary"
                   sx={{ mb: 3 }}
                 >
-                  Personalized recipe recommendations based on available
-                  ingredients, preferences, and dietary needs.
+                  Personalized recipe suggestions
                 </Typography>
                 <div className="button-container">
                   <Button
@@ -84,8 +84,7 @@ function Home() {
                   color="text.secondary"
                   sx={{ mb: 3 }}
                 >
-                  Keep track of your ingredients by adding them manually or
-                  scanning receipts and food photos.
+                  Keep track of your ingredients
                 </Typography>
                 <div className="button-container">
                   <Button
@@ -99,7 +98,44 @@ function Home() {
               </CardContent>
             </CardActionArea>
           </Card>
-        </Link> 
+        </Link>
+
+        <Link to="/history" className="feature-card">
+          <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+            <CardActionArea>
+              <CardContent sx={{ textAlign: "center", p: 4 }}>
+                <div className="icon-container">
+                  <HistoryIcon
+                    sx={{ fontSize: 40, color: green[600], mb: 2 }}
+                  />
+                </div>
+                <Typography
+                  variant="h5"
+                  component="h2"
+                  sx={{ mb: 2, color: "#333", fontWeight: "bold" }}
+                >
+                  View Cooking History
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 3 }}
+                >
+                  Track your cooking journey
+                </Typography>
+                <div className="button-container">
+                  <Button
+                    variant="outlined"
+                    color="success"
+                    sx={{ color: green[600] }}
+                  >
+                    View History
+                  </Button>
+                </div>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Link>
       </div>
     </>
   );
