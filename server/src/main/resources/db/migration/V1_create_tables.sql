@@ -43,7 +43,7 @@ CREATE TABLE recipes
     description      TEXT,
     servings         INT,
     recipe_origin_id VARCHAR(16),
-    recipe_type recipe_type
+    recipe_type TEXT
 );
 
 CREATE TABLE recipe_history

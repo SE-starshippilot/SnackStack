@@ -11,11 +11,24 @@ import java.util.List;
 
 import static spark.Spark.*;
 
-public final class RecipeIngredientController {
+public final class RecipeIngredientController implements Controller {
 
   private static final Logger logger = LoggerFactory.getLogger(RecipeIngredientController.class);
+  private final RecipeIngredientService svc;
+  private final Gson gson;
 
-  public static void registerRoutes(RecipeIngredientService svc, Gson gson) {
+  public RecipeIngredientController(RecipeIngredientService svc, Gson gson) {
+    this.svc = svc;
+    this.gson = gson;
+  }
+
+  @Override
+  public String getBasePath() {
+    return "/api/recipes/:recipeId/ingredients";
+  }
+
+  @Override
+  public void registerRoutes() {
 
     logger.info("Registering RecipeIngredient API routes");
 

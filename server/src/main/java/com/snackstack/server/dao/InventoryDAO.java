@@ -80,13 +80,12 @@ public interface InventoryDAO {
    * @return A list of InventoryItem objects belonging to the user
    */
   @SqlQuery("""
-      SELECT i.inventory_item_id, i.user_id, i.ingredient_id, 
-             ing.ingredient_name, i.purchase_date
+      SELECT ing.ingredient_name
       FROM inventory_items i
       JOIN ingredients ing ON i.ingredient_id = ing.ingredient_id
       WHERE i.user_id = :userId
       """)
-  List<InventoryItem> getUserInventory(@Bind("userId") Integer userId);
+  List<String> getUserInventoryItemNames(@Bind("userId") Integer userId);
 
   /**
    * Retrieves the IDs of all ingredients in a user's inventory.
@@ -160,16 +159,17 @@ public interface InventoryDAO {
    * so it might require a join or subquery in the actual implementation.
    *
    * @param userId The ID of the user
-   * @param ingredientName The name of the ingredient to remove
+   * @param ingredientId The id of the ingredient to remove
    * @return The number of rows affected
    */
   @SqlUpdate("""
       DELETE FROM inventory_items
-      WHERE user_id = :userId AND ingredient_name = :ingredientName
+      WHERE user_id = :userId AND ingredient_id = :ingredientId
+             RETURNING inventory_item_id
       """)
-  int deleteIngredient(
+  int deleteRecordByUserAndIngredientId(
       @Bind("userId") Integer userId,
-      @Bind("ingredientName") String ingredientName
+      @Bind("ingredientId") Integer ingredientId
   );
 
   /**

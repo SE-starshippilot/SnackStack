@@ -4,6 +4,7 @@ import com.snackstack.server.dao.IngredientDAO;
 import com.snackstack.server.dao.InventoryDAO;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.exceptions.RecordNotFound;
+import com.snackstack.server.model.InventoryItem;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -14,12 +15,13 @@ public class InventoryService {
 
   private final UserDAO userDAO;
   private final InventoryDAO inventoryDAO;
-
+  private final IngredientDAO ingredientDAO;
   private static final Logger logger = LoggerFactory.getLogger(InventoryService.class);
 
-  public InventoryService(UserDAO userDAO, InventoryDAO inventoryDAO) {
+  public InventoryService(UserDAO userDAO, InventoryDAO inventoryDAO, IngredientDAO ingredientDAO) {
     this.userDAO = userDAO;
     this.inventoryDAO = inventoryDAO;
+    this.ingredientDAO = ingredientDAO;
   }
 
   private Integer getUserId(String userName) {
@@ -36,13 +38,19 @@ public class InventoryService {
     }
   }
 
-  public long createIngredient(String userName, String ingredientName) {
+  public long addInventoryRecord(String userName, String ingredientName) {
     // add a new record to inventory database
     logger.info("Creating ingredient {} for user with name {}", ingredientName, userName);
     try {
       Integer userId = getUserId(userName);
       Instant now = Instant.now();
-      inventoryDAO.insert(userId, ingredientName, now);
+      int ingredientId;
+      if (ingredientDAO.ingredientExists(ingredientName)) {
+        ingredientId = ingredientDAO.getIngredientIdByName(ingredientName);
+      } else {
+        ingredientId = ingredientDAO.addIngredient(ingredientName);
+      }
+      inventoryDAO.addInventoryItem(userId, ingredientId, now);
     } catch (Exception e) {
       logger.error("Error searching user: {}", userName, e);
       throw e;
@@ -55,7 +63,7 @@ public class InventoryService {
     logger.info("Getting all ingredients for user with name: {}", userName);
     try {
       Integer userId = getUserId(userName);
-      return inventoryDAO.getAllIngredientsOfUser(userId);
+      return inventoryDAO.getUserInventoryItemNames(userId);
     } catch (Exception e) {
       logger.error("Error searching user: {}", userName, e);
       throw e;
@@ -66,7 +74,12 @@ public class InventoryService {
     logger.info("Deleting ingredient {} for user with name {}", ingredientName, userName);
     try {
       Integer userId = getUserId(userName);
-      int deleted = inventoryDAO.deleteIngredient(userId, ingredientName);
+      Integer ingredientId = ingredientDAO.getIngredientIdByName(ingredientName);
+      if (ingredientId == null) {
+        logger.warn("Ingredient {} does not exist in the database", ingredientName);
+        return -1;
+      }
+      int deleted = inventoryDAO.deleteRecordByUserAndIngredientId(userId, ingredientId);
       if (deleted == 0) {                                   // nothing matched → 404 later
         throw new RecordNotFound("Ingredient not found");
       }

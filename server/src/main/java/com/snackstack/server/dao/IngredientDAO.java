@@ -1,22 +1,22 @@
 package com.snackstack.server.dao;
 
+import com.snackstack.server.model.Ingredient;
 import java.util.List;
-
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
+import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-
-import com.snackstack.server.model.Ingredient;
 
 /**
  * Data Access Object for the ingredients table.
  * Provides methods to create, read, update, and delete ingredient records.
  * Uses JDBI SQL object API for database operations.
  */
-@RegisterBeanMapper(Ingredient.class)
+@RegisterConstructorMapper(Ingredient.class)
 public interface IngredientDAO {
 
   /*CREATE*/
@@ -26,12 +26,18 @@ public interface IngredientDAO {
    * @param ingredientName The name of the ingredient to add
    * @return The ID of the newly created ingredient
    */
-  @SqlUpdate("""
+  @SqlQuery("""
       INSERT INTO ingredients(ingredient_name)
       VALUES (:name)
       RETURNING ingredient_id
       """)
   Integer addIngredient(@Bind("name") String ingredientName);
+//  @SqlUpdate("""
+//      INSERT INTO ingredients(ingredient_name)
+//      VALUES (:name)
+//      """)
+//  @GetGeneratedKeys
+//  Integer addIngredient(@Bind("name") String ingredientName);
 
   /**
    * Adds multiple ingredients to the database in a single batch operation.
@@ -60,6 +66,13 @@ public interface IngredientDAO {
       """)
   String getIngredientNameById(@Bind("id") long ingredientId);
 
+
+  @SqlQuery("""
+      SELECT ingredient_id
+      FROM ingredients
+      WHERE ingredient_name = :name
+      """)
+  Integer getIngredientIdByName(@Bind("name") String name);
   /**
    * Retrieves multiple ingredients by their IDs.
    *

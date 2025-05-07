@@ -4,6 +4,7 @@ import static spark.Spark.*;
 
 import com.google.gson.Gson;
 import com.snackstack.server.exceptions.RecordNotFound;
+import com.snackstack.server.model.InventoryItem;
 import com.snackstack.server.service.InventoryService;
 import java.time.Instant;
 import java.util.List;
@@ -44,9 +45,9 @@ public class InventoryController implements Controller {
         String userName = req.params(":userName");
         logger.info("GET inventory for user '{}'", userName);
 
-        List<String> items = service.getIngredients(userName);
+        List<String> itemNames = service.getIngredients(userName);
         res.status(200);
-        return gson.toJson(items);
+        return gson.toJson(itemNames);
       });
 
       /* ---- POST /api/users/{userName}/inventory ---- */
@@ -56,7 +57,7 @@ public class InventoryController implements Controller {
 
         logger.info("POST add ingredient '{}' for user '{}'", body.ingredientName(), userName);
 
-        service.createIngredient(userName, body.ingredientName());
+        service.addInventoryRecord(userName, body.ingredientName());
 
         res.status(201);
         return gson.toJson(new SuccessBody(
