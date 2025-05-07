@@ -81,10 +81,12 @@ public interface InventoryDAO {
    */
   @SqlQuery("""
       SELECT ing.ingredient_name
+      SELECT ing.ingredient_name
       FROM inventory_items i
       JOIN ingredients ing ON i.ingredient_id = ing.ingredient_id
       WHERE i.user_id = :userId
       """)
+  List<String> getUserInventoryItemNames(@Bind("userId") Integer userId);
   List<String> getUserInventoryItemNames(@Bind("userId") Integer userId);
 
   /**
@@ -160,6 +162,7 @@ public interface InventoryDAO {
    *
    * @param userId The ID of the user
    * @param ingredientId The id of the ingredient to remove
+   * @param ingredientId The id of the ingredient to remove
    * @return The number of rows affected
    */
   @SqlUpdate("""
@@ -168,7 +171,9 @@ public interface InventoryDAO {
              RETURNING inventory_item_id
       """)
   int deleteRecordByUserAndIngredientId(
+  int deleteRecordByUserAndIngredientId(
       @Bind("userId") Integer userId,
+      @Bind("ingredientId") Integer ingredientId
       @Bind("ingredientId") Integer ingredientId
   );
 

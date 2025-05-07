@@ -1,9 +1,10 @@
 package com.snackstack.server.service;
 
+import java.util.List;
+
 import com.snackstack.server.dto.RecipeRequestDTO;
 import com.snackstack.server.dto.RecipeResponseDTO;
 import com.snackstack.server.exceptions.LLMServiceException;
-import java.util.List;
 
 public interface RecipeGenerator {
 

@@ -1,6 +1,7 @@
 package com.snackstack.server.service;
 
 import com.snackstack.server.dao.IngredientDAO;
+import com.snackstack.server.dao.IngredientDAO;
 import com.snackstack.server.dao.InventoryDAO;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.exceptions.RecordNotFound;
@@ -47,8 +48,10 @@ public class InventoryService {
       int ingredientId;
       if (ingredientDAO.ingredientExists(ingredientName)) {
         ingredientId = ingredientDAO.getIngredientIdByName(ingredientName);
+        logger.info("Ingredient {} already exists with id {}", ingredientName, ingredientId);
       } else {
         ingredientId = ingredientDAO.addIngredient(ingredientName);
+        logger.info("Added ingredient {} with id {}", ingredientName, ingredientId);
       }
       inventoryDAO.addInventoryItem(userId, ingredientId, now);
     } catch (Exception e) {

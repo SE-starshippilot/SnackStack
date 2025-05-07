@@ -43,7 +43,8 @@ CREATE TABLE recipes
     description      TEXT,
     servings         INT,
     recipe_origin_id VARCHAR(16),
-    recipe_type TEXT
+    recipe_type TEXT,
+    is_favorite BOOLEAN
 );
 
 CREATE TABLE recipe_history

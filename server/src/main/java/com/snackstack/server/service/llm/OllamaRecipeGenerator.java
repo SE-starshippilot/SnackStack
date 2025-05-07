@@ -1,5 +1,10 @@
 package com.snackstack.server.service.llm;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -8,15 +13,13 @@ import com.snackstack.server.dto.RecipeRequestDTO;
 import com.snackstack.server.dto.RecipeResponseDTO;
 import com.snackstack.server.exceptions.LLMServiceException;
 import com.snackstack.server.service.RecipeGenerator;
+
 import io.github.ollama4j.OllamaAPI;
 import io.github.ollama4j.models.chat.OllamaChatMessageRole;
 import io.github.ollama4j.models.chat.OllamaChatRequest;
 import io.github.ollama4j.models.chat.OllamaChatRequestBuilder;
 import io.github.ollama4j.models.chat.OllamaChatResult;
 import io.github.ollama4j.types.OllamaModelType;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OllamaRecipeGenerator implements RecipeGenerator {
 
