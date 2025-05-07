@@ -7,6 +7,7 @@ import { Footer } from "./Footer";
 import Home from "./Home";
 import { Navbar } from "./Navbar";
 import RecipesPage from "../pages/RecipesPage";
+import HistoryRecipes from "../pages/HistoryRecipes";
 
 import { SignedIn } from "@clerk/clerk-react";
 
@@ -28,6 +29,7 @@ function App() {
             )}
             <Route path="/" element={<Home />} />
             <Route path="/recipes" element={<RecipesPage />} />
+            <Route path="/history" element={<HistoryRecipes />} />
 
             <Route
               path="/inventory"

@@ -13,6 +13,7 @@ const navItems = [
   { name: "Home", path: "/" },
   { name: "Cook", path: "/cook" },
   { name: "Inventory", path: "/inventory" },
+  { name: "History", path: "/history" },
 ];
 
 interface NavbarProps {
