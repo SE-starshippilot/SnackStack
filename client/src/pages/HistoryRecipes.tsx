@@ -1,123 +1,24 @@
-import React, { useState } from "react";
-import { Box, Button, Typography, Paper } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router-dom";
-import "../styles/HistoryRecipes.css";
-import { green } from "@mui/material/colors";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
-import EventIcon from "@mui/icons-material/Event";
-import DescriptionIcon from "@mui/icons-material/Description";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
-import IconButton from "@mui/material/IconButton";
-import IcecreamOutlinedIcon from "@mui/icons-material/IcecreamOutlined";
-import Collapse from "@mui/material/Collapse";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: green[700],
-    color: "#f0f4c3",
-    fontSize: 16,
-    fontWeight: 500,
-    fontFamily: "inherit",
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-    fontFamily: "inherit",
-    color: green[900],
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: green[50],
-  },
-  "&:nth-of-type(even)": {
-    backgroundColor: "white",
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-  "& .MuiTableCell-root": {
-    fontFamily: "inherit",
-  },
-  cursor: "pointer",
-  "&:hover": {
-    backgroundColor: `${green[100]} !important`,
-  },
-}));
-
-const StyledPagination = styled(Pagination)(({ theme }) => ({
-  "& .MuiPaginationItem-root": {
-    "&.Mui-selected": {
-      backgroundColor: green[500],
-      color: theme.palette.common.white,
-      "&:hover": {
-        backgroundColor: green[600],
-      },
-    },
-  },
-}));
-
-interface RecipeIngredient {
-  ingredient_name: string;
-  quantity: number;
-  unit: string;
-  note?: string;
-}
-
-interface Recipe {
-  recipe_name: string;
-  servings: number;
-  description: string;
-  origin_name: string;
-  recipe_ingredients: RecipeIngredient[];
-  recipe_steps: string[];
-  date: string;
-}
-
-const columns = [
-  {
-    id: "expand",
-    label: "",
-    minWidth: 50,
-  },
-  {
-    id: "recipeName",
-    label: "Recipe Name",
-    minWidth: 170,
-    icon: <RestaurantMenuIcon sx={{ fontSize: 20 }} />,
-  },
-  {
-    id: "date",
-    label: "Generated On",
-    minWidth: 160,
-    icon: <EventIcon sx={{ fontSize: 20 }} />,
-  },
-  {
-    id: "description",
-    label: "Description",
-    minWidth: 200,
-    icon: <DescriptionIcon sx={{ fontSize: 20 }} />,
-  },
-  {
-    id: "ingredients",
-    label: "Ingredients Used",
-    minWidth: 200,
-    icon: <RestaurantIcon sx={{ fontSize: 20 }} />,
-  },
-];
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  Box,
+  Button,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { RecipeTable } from "../components/RecipeTable";
+import "../styles/HistoryRecipes.css";
+import { Recipe } from "../types/recipe";
 
 const historyList: Recipe[] = [
   {
+    id: "recipe-1",
     recipe_name: "Grilled Chicken with Roasted Vegetables and Rice",
     servings: 2,
     description:
@@ -145,6 +46,7 @@ const historyList: Recipe[] = [
     date: "2024-03-15",
   },
   {
+    id: "recipe-2",
     recipe_name: "Chicken and Vegetable Stir-Fry",
     servings: 2,
     description:
@@ -171,6 +73,7 @@ const historyList: Recipe[] = [
     date: "2024-03-14",
   },
   {
+    id: "recipe-3",
     recipe_name: "Chicken and Vegetable Fried Rice",
     servings: 2,
     description:
@@ -198,172 +101,113 @@ const historyList: Recipe[] = [
   },
 ];
 
-function Row({ row }: { row: Recipe }) {
-  const [open, setOpen] = useState(false);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
-
-  return (
-    <React.Fragment>
-      <StyledTableRow
-        onClick={handleClick}
-        sx={{ "& > *": { borderBottom: "unset" } }}
-      >
-        <StyledTableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            sx={{
-              transition: "transform 0.3s",
-              transform: open ? "rotate(90deg)" : "rotate(0deg)",
-              pointerEvents: "none",
-            }}
-          >
-            <IcecreamOutlinedIcon />
-          </IconButton>
-        </StyledTableCell>
-        <StyledTableCell>{row.recipe_name}</StyledTableCell>
-        <StyledTableCell>{row.date}</StyledTableCell>
-        <StyledTableCell>{row.description}</StyledTableCell>
-        <StyledTableCell>
-          {row.recipe_ingredients.map((i) => i.ingredient_name).join(", ")}
-        </StyledTableCell>
-      </StyledTableRow>
-      <TableRow>
-        <StyledTableCell
-          style={{ paddingBottom: 0, paddingTop: 0 }}
-          colSpan={5}
-        >
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 2 }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                component="div"
-                color={green[700]}
-              >
-                Recipe Details
-              </Typography>
-              <Box sx={{ mb: 2 }}>
-                <Table
-                  size="small"
-                  sx={{
-                    maxWidth: "600px",
-                    borderCollapse: "collapse",
-                    "& th, & td": {
-                      fontSize: "0.875rem",
-                      fontFamily: "inherit",
-                      borderBottom: "none",
-                    },
-                    "& thead th": {
-                      borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-                      fontWeight: 600,
-                    },
-                    border: "1px solid rgba(0, 0, 0, 0.12)",
-                  }}
-                >
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ width: "55%" }}>Ingredient</TableCell>
-                      <TableCell sx={{ width: "25%" }}>Quantity</TableCell>
-                      <TableCell sx={{ width: "20%" }}>Unit</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {row.recipe_ingredients.map((ingredient, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          {ingredient.ingredient_name}
-                          {ingredient.note && (
-                            <span
-                              style={{
-                                marginLeft: "8px",
-                                color: "rgba(0, 0, 0, 0.6)",
-                                fontStyle: "italic",
-                              }}
-                            >
-                              (Note: {ingredient.note})
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell>{ingredient.quantity}</TableCell>
-                        <TableCell>{ingredient.unit}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-              <Box>
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  component="div"
-                  sx={{ color: "rgba(0, 0, 0, 0.87)", fontWeight: 600 }}
-                >
-                  Steps
-                </Typography>
-                <Box
-                  component="ol"
-                  sx={{ mt: 1, pl: 2, color: "rgba(0, 0, 0, 0.87)" }}
-                >
-                  {row.recipe_steps.map((step, index) => (
-                    <li key={index} style={{ marginBottom: "8px" }}>
-                      {step}
-                    </li>
-                  ))}
-                </Box>
-              </Box>
-            </Box>
-          </Collapse>
-        </StyledTableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
-
 const HistoryRecipes: React.FC = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [recipes, setRecipes] = useState(historyList);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    value: number
-  ) => {
-    setPage(value);
+  const handleToggleFavorite = (targetRecipe: Recipe) => {
+    setRecipes(
+      recipes.map((recipe) =>
+        recipe === targetRecipe
+          ? { ...recipe, isFavorite: !recipe.isFavorite }
+          : recipe
+      )
+    );
   };
 
-  const pageCount = Math.ceil(historyList.length / rowsPerPage);
+  const handleSearch = () => {
+    const filtered = historyList.filter(
+      (recipe) =>
+        recipe.recipe_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.recipe_ingredients.some((ing) =>
+          ing.ingredient_name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+    setRecipes(filtered);
+    setPage(1);
+  };
 
-  if (historyList.length === 0) {
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...historyList];
+
+    if (showFavoritesOnly) {
+      filtered = filtered.filter((recipe) => recipe.isFavorite);
+    }
+
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
+
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (recipe) =>
+          recipe.recipe_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          recipe.recipe_ingredients.some((ing) =>
+            ing.ingredient_name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+      );
+    }
+
+    setRecipes(filtered);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [showFavoritesOnly, sortOrder]);
+
+  const rowsPerPage = 10;
+  const pageCount = Math.ceil(recipes.length / rowsPerPage);
+
+  if (recipes.length === 0) {
     return (
       <Box className="history-container empty">
-        <Typography
-          variant="h3"
-          fontWeight="bold"
-          gutterBottom
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          gap={2}
         >
-          <MenuBookIcon sx={{ fontSize: 45, marginRight: 1 }} />
-          Cooking History
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-          Your cooking journey starts here!
-        </Typography>
-        <Button
-          variant="contained"
-          color="success"
-          sx={{ color: "white", marginTop: 2 }}
-          onClick={() => navigate("/cook")}
-        >
-          Generate Your First Recipe
-        </Button>
+          <Typography
+            variant="h3"
+            fontWeight="bold"
+            gutterBottom
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <MenuBookIcon sx={{ fontSize: 45, marginRight: 1 }} />
+            Cooking History
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+            Your cooking journey starts here!
+          </Typography>
+          <Button
+            variant="contained"
+            color="success"
+            sx={{ color: "white" }}
+            onClick={() => navigate("/cook")}
+          >
+            Generate Your First Recipe
+          </Button>
+        </Box>
       </Box>
     );
   }
@@ -389,55 +233,76 @@ const HistoryRecipes: React.FC = () => {
         </Typography>
       </div>
 
-      <div className="history-table-container">
-        <TableContainer component={Paper}>
-          <Table stickyHeader aria-label="cooking history table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <StyledTableCell
-                    key={column.id}
-                    style={{ minWidth: column.minWidth }}
-                  >
-                    {column.id === "expand" ? null : (
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                      >
-                        {column.icon}
-                        {column.label}
-                      </Box>
-                    )}
-                  </StyledTableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {historyList
-                .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                .map((row, index) => (
-                  <Row key={index} row={row} />
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Stack
-          spacing={2}
+      <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
+        <TextField
+          placeholder="Search recipes..."
+          size="small"
+          color="success"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleKeyPress}
+          inputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon sx={{ color: "action.active" }} />
+              </InputAdornment>
+            ),
+          }}
           sx={{
-            mt: 2,
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "flex-end",
+            flexGrow: 1,
+            "& .MuiInputBase-root": {
+              height: "36px",
+            },
+          }}
+        />
+
+        <Button
+          variant={showFavoritesOnly ? "contained" : "outlined"}
+          color="success"
+          // onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+          startIcon={<FavoriteIcon />}
+          sx={{
+            height: "36px",
+            textTransform: "none",
+            px: 2,
           }}
         >
-          <StyledPagination
-            count={pageCount}
-            page={page}
-            onChange={handlePageChange}
-            showFirstButton
-            showLastButton
-          />
-        </Stack>
-      </div>
+          Favorites
+        </Button>
+
+        <ToggleButtonGroup
+          color="success"
+          value={sortOrder}
+          exclusive
+          onChange={(_, newValue) => newValue && setSortOrder(newValue)}
+          aria-label="recipe sort order"
+          sx={{
+            height: "36px",
+            "& .MuiToggleButton-root": {
+              textTransform: "none",
+              px: 2,
+              "&.Mui-selected": {
+                color: "white",
+                backgroundColor: "success.main",
+                "&:hover": {
+                  backgroundColor: "success.dark",
+                },
+              },
+            },
+          }}
+        >
+          <ToggleButton value="newest">Newest</ToggleButton>
+          <ToggleButton value="oldest">Oldest</ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+
+      <RecipeTable
+        recipes={recipes}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(_, value) => setPage(value)}
+        onToggleFavorite={handleToggleFavorite}
+      />
     </Box>
   );
 };

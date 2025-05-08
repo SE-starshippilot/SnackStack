@@ -10,9 +10,9 @@
 }
 
 .history-container.empty {
-  flex: 1;
-  justify-content: center;
+  display: flex;
   align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
