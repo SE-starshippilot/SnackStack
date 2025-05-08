@@ -2,31 +2,36 @@ import { Box, Button, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/InventoryManagement.css";
+import { useUser } from "@clerk/clerk-react";
 
 function InventoryManagement() {
     const [inputValue, setInputValue] = useState('');
     const [ingredients, setIngredients] = useState<Set<string>>(new Set());
     const [clickedItems, setClickedItems] = useState<string[]>([]);
     const navigate = useNavigate();
+    const { user, isLoaded } = useUser();
 
     useEffect(() => {
-        const fetchIngredients = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/api/users/john_doe/inventory");
+        if (isLoaded && user) {
+            const fetchIngredients = async () => {
+                try {
+                    const username = user.username || user.firstName || "unknown_user";
+                    const response = await fetch(`http://localhost:8080/api/users/${username}/inventory`);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const ingredientList: string[] = data;
+                    setIngredients(new Set(ingredientList));
+                } catch (error) {
+                    console.error("Failed to fetch ingredients:", error);
                 }
+            };
 
-                const data = await response.json();
-                const ingredientList: string[] = data;
-                setIngredients(new Set(ingredientList));
-            } catch (error) {
-                console.error("Failed to fetch ingredients:", error);
-            }
-        };
-
-        fetchIngredients();
+            fetchIngredients();
+        }
     }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,28 +40,30 @@ function InventoryManagement() {
 
     const handleConfirmClick = async () => {
         const lowerCaseItem = inputValue.toLowerCase();
+        if (isLoaded && user) {
+            const username = user.username || user.firstName || "unknown_user";
+            if (inputValue.trim() !== '' && ![...ingredients].some((ingredient) => ingredient.toLowerCase() === lowerCaseItem)) {
+                try {
+                    const response = await fetch(`http://localhost:8080/api/users/${username}/inventory`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            ingredientName: inputValue
+                        })
+                    });
 
-        if (inputValue.trim() !== '' && ![...ingredients].some((ingredient) => ingredient.toLowerCase() === lowerCaseItem)) {
-            try {
-                const response = await fetch("http://localhost:8080/api/users/john_doe/inventory", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        ingredientName: inputValue
-                    })
-                });
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status ${response.status}`);
+                    }
 
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
+                    // update front-end
+                    setIngredients((prev) => new Set(prev.add(inputValue)));
+                    setInputValue('');
+                } catch (err) {
+                    console.error("Failed to add ingredient:", err);
                 }
-
-                // update front-end
-                setIngredients((prev) => new Set(prev.add(inputValue)));
-                setInputValue('');
-            } catch (err) {
-                console.error("Failed to add ingredient:", err);
             }
         }
     };
@@ -71,24 +78,27 @@ function InventoryManagement() {
 
     const handleDeleteItems = async () => {
         try {
-            await Promise.all(
-                clickedItems.map(async (item) => {
-                    const response = await fetch(
-                        `http://localhost:8080/api/users/john_doe/inventory/${encodeURIComponent(item)}`,
-                        {
-                            method: "DELETE"
+            if (isLoaded && user) {
+                const username = user.username || user.firstName || "unknown_user";
+                await Promise.all(
+                    clickedItems.map(async (item) => {
+                        const response = await fetch(
+                            `http://localhost:8080/api/users/${username}/inventory/${encodeURIComponent(item)}`,
+                            {
+                                method: "DELETE"
+                            }
+                        );
+
+                        if (!response.ok && response.status !== 204) {
+                            throw new Error(`Failed to delete '${item}', status: ${response.status}`);
                         }
-                    );
+                    })
+                );
 
-                    if (!response.ok && response.status !== 204) {
-                        throw new Error(`Failed to delete '${item}', status: ${response.status}`);
-                    }
-                })
-            );
-
-            // update front-end state
-            setIngredients((prev) => new Set([...prev].filter((item) => !clickedItems.includes(item))));
-            setClickedItems([]);
+                // update front-end state
+                setIngredients((prev) => new Set([...prev].filter((item) => !clickedItems.includes(item))));
+                setClickedItems([]);
+            }
         } catch (err) {
             console.error("Failed to delete ingredient(s):", err);
         }

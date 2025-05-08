@@ -10,8 +10,51 @@ import {
 import { green } from "@mui/material/colors";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
+import { useUser } from "@clerk/clerk-react";
+import { useEffect } from "react";
 
 function Home() {
+  const { user, isLoaded } = useUser();
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      const saveUserIfNotExists = async () => {
+        const username = user.username || user.firstName || "unknown_user";
+        const email = user.primaryEmailAddress?.emailAddress || "no_email";
+
+        try {
+          const res = await fetch(`http://localhost:8080/api/users/${username}/id`);
+
+          // user does not exist
+          if (res.status === 404) {
+            const postRes = await fetch("http://localhost:8080/api/users", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ userName: username, email }),
+            });
+
+            if (!postRes.ok) {
+              console.error("Failed to create user:", postRes.status);
+            } else {
+              console.log("User created successfully");
+            }
+          } else if (res.ok) {
+            console.log("User already exists, skipping creation.");
+          } else {
+            console.error("Unexpected response when checking user:", res.status);
+          }
+        } catch (err) {
+          console.error("Error checking or creating user:", err);
+        }
+      };
+
+      saveUserIfNotExists();
+    }
+  }, [isLoaded, user]);
+
+
   return (
     <>
       <div className="hero-section">
@@ -99,7 +142,7 @@ function Home() {
               </CardContent>
             </CardActionArea>
           </Card>
-        </Link> 
+        </Link>
       </div>
     </>
   );

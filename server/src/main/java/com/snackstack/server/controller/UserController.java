@@ -58,6 +58,23 @@ public class UserController implements Controller {
         logger.info("User deleted successfully: {}", username);
         return "";
       });
+
+      /* ---- GET /api/users/:name/id ----  (get user ID by username) */
+      get("/:name/id", (req, res) -> {
+        String username = req.params(":name");
+        logger.info("Received request to get user ID for: {}", username);
+
+        try {
+          long userId = service.getUserIdByName(username);
+          res.status(200);
+          return gson.toJson(new IdResponse(userId));
+        } catch (Exception e) {
+          logger.warn("User not found or error occurred: {}", username);
+          res.status(404);
+          return "";
+        }
+      });
+
     });
 
     logger.info("User API routes registered successfully");

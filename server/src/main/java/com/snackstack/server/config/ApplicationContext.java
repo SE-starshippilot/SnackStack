@@ -16,7 +16,7 @@ public class ApplicationContext implements AutoCloseable {
   private static final Logger logger = LoggerFactory.getLogger(ApplicationContext.class);
 
   private final DBConfig dbConfig;
-  private final OllamaConfig ollamaConfig;
+//  private final OllamaConfig ollamaConfig;
   private final Gson gson;
   private final UserDAO userDAO;
   private final InventoryDAO inventoryDAO;
@@ -24,7 +24,7 @@ public class ApplicationContext implements AutoCloseable {
   private final RecipesDAO recipesDAO;
   private final RecipeIngredientDAO recipeIngredientDAO;
   private final RecipeStepsDAO recipeStepsDAO;
-  private final RecipeGenerator recipeGenerator;
+//  private final RecipeGenerator recipeGenerator;
   private final UserService userService;
   private final InventoryService inventoryService;
   private final RecipesService recipesService;
@@ -45,14 +45,14 @@ public class ApplicationContext implements AutoCloseable {
     this.gson = new Gson();
 
     // Initialize Recipe Generator
-    if (mock) {
-      this.ollamaConfig = config.configOllama();
-      this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig, this.gson);
-    } else {
-      this.ollamaConfig = config.configOllama();
-      this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig,
-          this.gson); // !TODO: change this to other
-    }
+//    if (mock) {
+//      this.ollamaConfig = config.configOllama();
+//      this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig, this.gson);
+//    } else {
+//      this.ollamaConfig = config.configOllama();
+//      this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig,
+//          this.gson); // !TODO: change this to other
+//    }
 
     // Initialize DAOs
     this.userDAO = jdbi.onDemand(UserDAO.class);
