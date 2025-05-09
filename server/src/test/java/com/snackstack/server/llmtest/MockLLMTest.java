@@ -1,4 +1,4 @@
-package com.snackstack.server;
+package com.snackstack.server.llmtest;
 
 import com.google.gson.Gson;
 import com.snackstack.server.dto.RecipeResponseDTO;
