@@ -97,4 +97,5 @@ public class InventoryController implements Controller {
   private record ErrorBody(String error) {
 
   }
+
 }
