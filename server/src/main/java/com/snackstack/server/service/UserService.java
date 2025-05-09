@@ -19,14 +19,14 @@ public class UserService {
     logger.debug("UserService initialized");
   }
 
-  public long createUser(UserDTO req) {
+  public int createUser(UserDTO req) {
     try {
       logger.info("Creating new user with username: {}", req.userName());
       // 1. uniqueness format checks (omitted, maybe will implement later idk)
       // 2. get current time instant
       Instant now = Instant.now();
       // 3. delegate to DAO
-      long userId = dao.insert(req.userName(), req.email(), now, now);
+      int userId = dao.insert(req.userName(), req.email(), now, now);
       logger.info("Successfully created user with ID: {}", userId);
       return userId;
     } catch (Exception e) {
@@ -47,7 +47,7 @@ public class UserService {
     }
   }
 
-  public long getUserIdByName(String userName) {
+  public int getUserIdByName(String userName) {
     try {
       logger.info("Searching user with username: {}", userName);
       Optional<Integer> uid = dao.getUserIdByName(userName);

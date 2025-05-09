@@ -37,7 +37,7 @@ public class AppConfig {
   public OllamaConfig configOllama() throws RuntimeException {
     try {
       String ollamaHostURL = getField("OLLAMA_URL");
-      String systemPromptPath = getField("SYSTEM_PROMPT_PATH");
+      String systemPromptPath = getField("LLM_SYSTEM_PROMPT_FILE");
       String ollamaModel = getField("OLLAMA_MODEL");
       return new OllamaConfig(ollamaHostURL, systemPromptPath, ollamaModel);
     } catch (Exception e) {

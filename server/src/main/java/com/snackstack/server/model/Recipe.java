@@ -1,15 +1,14 @@
 package com.snackstack.server.model;
 
-import java.util.List;
-
-
 public record Recipe(
     int id,
     String recipeName,
     String description,
-    int servings,
+    Integer servings,
     String recipeOrigin,
-    String recipeType
+    String recipeType,
+    Boolean isFavorite,
+    String uuid
 ) {
 
 }

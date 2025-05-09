@@ -24,7 +24,7 @@ public interface IngredientDAO {
    * @param ingredientName The name of the ingredient to add
    * @return The ID of the newly created ingredient
    */
-  @SqlUpdate("""
+  @SqlQuery("""
       INSERT INTO ingredients(ingredient_name)
       VALUES (:name)
       RETURNING ingredient_id

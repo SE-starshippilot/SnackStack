@@ -10,6 +10,7 @@ import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.service.InventoryService;
 import com.snackstack.server.service.RecipeGenerator;
 import com.snackstack.server.service.UserService;
+import com.snackstack.server.service.llm.MockRecipeGenerator;
 import com.snackstack.server.service.llm.OllamaRecipeGenerator;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -22,12 +23,12 @@ public class ApplicationContext implements AutoCloseable {
   private static final Logger logger = LoggerFactory.getLogger(ApplicationContext.class);
 
   private final DBConfig dbConfig;
-  // private final OllamaConfig ollamaConfig;
+   private OllamaConfig ollamaConfig;
   private final Gson gson;
   private final UserDAO userDAO;
   private final InventoryDAO inventoryDAO;
   private final IngredientDAO ingredientDAO;
-  // private final RecipeGenerator recipeGenerator;
+   private final RecipeGenerator recipeGenerator;
   private final UserService userService;
   private final InventoryService inventoryService;
   private final List<Controller> controllers = new ArrayList<>();
@@ -45,14 +46,13 @@ public class ApplicationContext implements AutoCloseable {
     this.gson = new Gson();
 
     // Initialize Recipe Generator
-    // if (mock) {
-    //   this.ollamaConfig = config.configOllama();
-    //   this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig, this.gson);
-    // } else {
-    //   this.ollamaConfig = config.configOllama();
-    //   this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig,
-    //       this.gson); // !TODO: change this to other
-    // }
+     if (mock) {
+       this.recipeGenerator = new MockRecipeGenerator(this.gson);
+     } else {
+       this.ollamaConfig = config.configOllama();
+       this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig,
+           this.gson); // !TODO: change this to other
+     }
 
     // Initialize DAOs
     this.userDAO = jdbi.onDemand(UserDAO.class);
