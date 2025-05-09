@@ -18,7 +18,7 @@ import org.junit.Test;
 public class UserServiceTest {
 
   @Rule
-  public JdbiRule jdbiRule = JdbiRule.h2().withPlugin(new SqlObjectPlugin());;
+  public JdbiRule jdbiRule = JdbiRule.h2().withPlugin(new SqlObjectPlugin());
 
   private UserDAO userDAO;
   private UserService userService;

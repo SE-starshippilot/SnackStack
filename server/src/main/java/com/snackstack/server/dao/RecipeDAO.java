@@ -2,9 +2,10 @@ package com.snackstack.server.dao;
 
 import com.snackstack.server.model.Recipe;
 import java.util.List;
-import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
+import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -14,7 +15,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
  * Provides methods to create, read, update, and delete recipe records.
  * Uses JDBI SQL object API for database operations.
  */
-@RegisterBeanMapper(Recipe.class)
+@RegisterConstructorMapper(Recipe.class)
 public interface RecipeDAO {
 
   /*CREATE*/
@@ -26,21 +27,21 @@ public interface RecipeDAO {
    * @param servings The number of servings
    * @param recipeOriginId The origin ID of the recipe
    * @param recipeType The type of the recipe
-   * @param isFavorite Whether the recipe is marked as favorite
+   * @param uuid The UUID of the recipe
    * @return The ID of the newly created recipe
    */
   @SqlUpdate("""
-      INSERT INTO recipes(recipe_name, description, servings, recipe_origin_id, recipe_type, is_favorite)
-      VALUES (:name, :description, :servings, :originId, :type::recipe_type, :favorite)
-      RETURNING recipe_id
+      INSERT INTO recipes(recipe_name, description, servings, recipe_origin_id, recipe_type, uuid)
+      VALUES (:name, :description, :servings, :originId, :type, :uuid)
       """)
-  Integer addRecipe(
+  @GetGeneratedKeys("recipe_id")
+  int addRecipe(
       @Bind("name") String recipeName,
       @Bind("description") String description,
       @Bind("servings") int servings,
       @Bind("originId") String recipeOriginId,
       @Bind("type") String recipeType,
-      @Bind("favorite") boolean isFavorite
+      @Bind("uuid") String uuid
   );
 
   /*READ*/
@@ -57,17 +58,19 @@ public interface RecipeDAO {
         description,
         servings,
         recipe_origin_id as recipeOrigin,
-        recipe_type::text as recipeType,
-        is_favorite
+        recipe_type as recipeType,
+        is_favorite as isFavorite,
+        uuid
       FROM recipes
       WHERE recipe_id = :id
       """)
   Recipe getRecipeById(@Bind("id") Integer recipeId);
 
   /**
-   * Retrieves all recipes from the database.
+   * Retrieves a single recipe by its UUID.
    *
-   * @return A list of all Recipe objects
+   * @param uuid The UUID of the recipe to retrieve
+   * @return The Recipe object or null if not found
    */
   @SqlQuery("""
       SELECT 
@@ -76,8 +79,29 @@ public interface RecipeDAO {
         description,
         servings,
         recipe_origin_id as recipeOrigin,
-        recipe_type::text as recipeType,
-        is_favorite
+        recipe_type as recipeType,
+        is_favorite as isFavorite,
+        uuid
+      FROM recipes
+      WHERE uuid = :uuid
+      """)
+  Recipe getRecipeByUuid(@Bind("uuid") String uuid);
+
+  /**
+   * Retrieves all recipes from the database.
+   *
+   * @return A list of all Recipe objects
+   */
+  @SqlQuery("""
+      SELECT
+        recipe_id as id,
+        recipe_name as recipeName,
+        description,
+        servings,
+        recipe_origin_id as recipeOrigin,
+        recipe_type as recipeType,
+        is_favorite as isFavorite,
+        uuid
       FROM recipes
       """)
   List<Recipe> getAllRecipes();
@@ -95,8 +119,9 @@ public interface RecipeDAO {
         description,
         servings,
         recipe_origin_id as recipeOrigin,
-        recipe_type::text as recipeType,
-        is_favorite
+        recipe_type as recipeType,
+        is_favorite as isFavorite,
+        uuid
       FROM recipes
       WHERE recipe_id IN (<ids>)
       """)
@@ -115,10 +140,11 @@ public interface RecipeDAO {
         description,
         servings,
         recipe_origin_id as recipeOrigin,
-        recipe_type::text as recipeType,
-        is_favorite
+        recipe_type as recipeType,
+        is_favorite as isFavorite,
+        uuid
       FROM recipes
-      WHERE recipe_type = :type::recipe_type
+      WHERE recipe_type = :type
       """)
   List<Recipe> getRecipesByType(@Bind("type") String recipeType);
 
@@ -134,8 +160,9 @@ public interface RecipeDAO {
         description,
         servings,
         recipe_origin_id as recipeOrigin,
-        recipe_type::text as recipeType,
-        is_favorite
+        recipe_type as recipeType,
+        is_favorite as isFavorite,
+        uuid
       FROM recipes
       WHERE is_favorite = true
       """)
@@ -152,6 +179,7 @@ public interface RecipeDAO {
    * @param recipeOriginId The new origin ID of the recipe
    * @param recipeType The new type of the recipe
    * @param isFavorite The new favorite status
+   * @param uuid The UUID of the recipe
    * @return The number of rows affected (should be 1 if successful)
    */
   @SqlUpdate("""
@@ -160,8 +188,9 @@ public interface RecipeDAO {
           description = :description,
           servings = :servings,
           recipe_origin_id = :originId,
-          recipe_type = :type::recipe_type,
-          is_favorite = :favorite
+          recipe_type = :type,
+          is_favorite = :favorite,
+          uuid = :uuid
       WHERE recipe_id = :id
       """)
   int updateRecipe(
@@ -171,7 +200,8 @@ public interface RecipeDAO {
       @Bind("servings") int servings,
       @Bind("originId") String recipeOriginId,
       @Bind("type") String recipeType,
-      @Bind("favorite") boolean isFavorite
+      @Bind("favorite") boolean isFavorite,
+      @Bind("uuid") String uuid
   );
 
   /**
@@ -202,6 +232,18 @@ public interface RecipeDAO {
   int deleteRecipeById(@Bind("id") Integer recipeId);
 
   /**
+   * Deletes a recipe from the database by its UUID.
+   *
+   * @param uuid The UUID of the recipe to delete
+   * @return The number of rows affected (should be 1 if successful)
+   */
+  @SqlUpdate("""
+      DELETE FROM recipes
+      WHERE uuid = :uuid
+      """)
+  int deleteRecipeByUuid(@Bind("uuid") String uuid);
+
+  /**
    * Deletes multiple recipes in a single batch operation.
    * This is more efficient than deleting recipes one by one.
    *
@@ -229,6 +271,20 @@ public interface RecipeDAO {
   boolean recipeExists(@Bind("name") String recipeName);
 
   /**
+   * Checks if a recipe with the given UUID exists in the database.
+   *
+   * @param uuid The UUID of the recipe to check
+   * @return true if the recipe exists, false otherwise
+   */
+  @SqlQuery("""
+      SELECT EXISTS(
+        SELECT 1 FROM recipes
+        WHERE uuid = :uuid
+      )
+      """)
+  boolean recipeExistsByUuid(@Bind("uuid") String uuid);
+
+  /**
    * Retrieves recipes by a search term in the name or description.
    *
    * @param searchTerm The term to search for
@@ -241,8 +297,9 @@ public interface RecipeDAO {
         description,
         servings,
         recipe_origin_id as recipeOrigin,
-        recipe_type::text as recipeType,
-        is_favorite
+        recipe_type as recipeType,
+        is_favorite as isFavorite,
+        uuid
       FROM recipes
       WHERE 
         recipe_name ILIKE '%' || :term || '%' OR 
