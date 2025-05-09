@@ -8,8 +8,8 @@ import org.junit.Test;
 
 public class MockLLMTest {
 
-  private final MockRecipeGenerator mockLLM = new MockRecipeGenerator();
   private final Gson gson = new Gson();
+  private final MockRecipeGenerator mockLLM = new MockRecipeGenerator(gson);
 
   @Test
   public void testGeneration() {
