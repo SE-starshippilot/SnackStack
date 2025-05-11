@@ -1,8 +1,11 @@
 .main-content {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 40px 20px;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .hero-section {
@@ -40,82 +43,149 @@
 
 .feature-cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(280px, 350px));
   gap: 32px;
-  max-width: 900px;
+  justify-content: center;
   margin: 0 auto;
+  width: 100%;
+  padding: 0 20px;
+  max-width: 1200px;
 }
 
 .feature-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
+  height: 100%;
+  background: white;
+  min-width: 0;
+  max-width: 400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px) scale(1.02);
+  transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
-.card-content {
-  padding: 32px;
+/* 确保卡片内容区域占满整个高度 */
+.MuiCard-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
+.MuiCardActionArea-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.MuiCardContent-root {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px !important;
+  min-width: 0;
+}
+
+/* 图标容器固定高度 */
 .icon-container {
-  /* height: ; */
   display: flex;
   justify-content: center;
-  margin-bottom: 16px;
-}
-
-.feature-icon {
-  color: #10b981;
-}
-
-.card-title {
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 16px;
-  color: #333;
-}
-
-.card-description {
-  text-align: center;
-  color: #666;
+  align-items: center;
+  height: 60px;
   margin-bottom: 24px;
+  flex-shrink: 0;
 }
 
-.button-container {
-  display: flex;
-  justify-content: center;
+/* 标题样式 */
+.MuiTypography-h5 {
+  font-size: 24px !important;
+  font-weight: bold !important;
+  margin-bottom: 16px !important;
+  text-align: center !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 0 8px !important;
 }
 
-.primary-button {
-  background-color: #10b981;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+/* 描述文本样式 */
+.MuiTypography-body2 {
+  font-size: 16px !important;
+  text-align: center !important;
+  margin-bottom: 32px !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  padding: 0 8px !important;
+  color: #666 !important;
 }
 
-.primary-button:hover {
-  background-color: #059669;
+/* 按钮样式 */
+.MuiButton-root {
+  min-width: 160px !important;
+  margin-top: auto !important;
+  padding: 8px 24px !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .feature-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(250px, 300px));
+    gap: 24px;
   }
 
-  .main-title {
-    font-size: 28px;
+  .MuiCardContent-root {
+    padding: 24px !important;
+  }
+}
+
+@media (max-width: 959px) {
+  .feature-cards {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .feature-cards {
+    grid-template-columns: minmax(280px, 400px);
+    gap: 16px;
   }
 
-  .subtitle {
-    font-size: 16px;
+  .MuiCardContent-root {
+    padding: 24px !important;
+  }
+
+  .icon-container {
+    height: 48px;
+    margin-bottom: 16px;
+  }
+
+  .MuiTypography-h5 {
+    font-size: 20px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .MuiTypography-body2 {
+    font-size: 14px !important;
+    margin-bottom: 24px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .feature-cards {
+    padding: 0 16px;
+  }
+
+  .MuiCardContent-root {
+    padding: 20px !important;
   }
 }
