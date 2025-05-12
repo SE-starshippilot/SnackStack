@@ -39,13 +39,13 @@ CREATE TYPE recipe_type AS ENUM ('Main', 'Appetizer', 'Dessert', 'Breakfast', 'S
 CREATE TABLE recipes
 (
     recipe_id        SERIAL PRIMARY KEY,
-    recipe_name      TEXT NOT NULL,
+    recipe_name      TEXT        NOT NULL,
     description      TEXT,
     servings         INT,
     recipe_origin_id VARCHAR(16),
-    recipe_type recipe_type,
-    is_favorite BOOLEAN DEFAULT false,
-    uuid VARCHAR(32) NOT NULL UNIQUE
+    recipe_type      recipe_type,
+    is_favorite      BOOLEAN DEFAULT false,
+    uuid             VARCHAR(32) NOT NULL UNIQUE
 );
 
 CREATE TABLE recipe_history
@@ -72,16 +72,46 @@ CREATE TABLE recipe_steps
 
 CREATE TABLE recipe_ingredients
 (
-    recipe_id     INT NOT NULL
+    recipe_id     INT            NOT NULL
         REFERENCES recipes (recipe_id)
             ON DELETE CASCADE,
-    ingredient_id INT NOT NULL
+    ingredient_id INT            NOT NULL
         REFERENCES ingredients (ingredient_id)
             ON DELETE RESTRICT,
-    quantity      DECIMAL(10, 2) NOT NULL ,
+    quantity      DECIMAL(10, 2) NOT NULL,
     unit          VARCHAR(50),
     note          TEXT,
     PRIMARY KEY (recipe_id, ingredient_id)
 );
 
+CREATE TABLE recipe_requests
+(
+    recipe_request_id  SERIAL PRIMARY KEY,
+    user_id     INT NOT NULL
+        REFERENCES users (user_id)
+            ON DELETE CASCADE,
+    servings    INT NOT NULL,
+    recipe_type recipe_type,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
+CREATE TABLE recipe_request_origins
+(
+    recipe_request_origin_id SERIAL PRIMARY KEY,
+    recipe_request_id  INT NOT NULL
+        REFERENCES recipe_requests (recipe_request_id)
+            ON DELETE CASCADE ,
+    origin_name VARCHAR(32) NOT NULL
+);
+
+CREATE TABLE recipe_request_allergies
+(
+    recipe_request_allergy_id SERIAL PRIMARY KEY,
+    recipe_request_id INT NOT NULL
+        REFERENCES recipe_requests(recipe_request_id)
+            ON DELETE CASCADE,
+    allergy_name VARCHAR(32) NOT NULL
+);
+
+CREATE INDEX idx_recipe_request_origins_request_id ON recipe_request_origins(recipe_request_id);
+CREATE INDEX idx_recipe_request_allergies_request_id ON recipe_request_allergies(recipe_request_id);
