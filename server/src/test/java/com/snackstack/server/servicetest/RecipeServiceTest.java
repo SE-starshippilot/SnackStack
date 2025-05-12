@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.snackstack.server.dao.IngredientDAO;
 import com.snackstack.server.dao.RecipeDAO;
 import com.snackstack.server.dao.RecipeIngredientDAO;
-import com.snackstack.server.dao.RecipeRequestDAO;
 import com.snackstack.server.dao.RecipeStepDAO;
 import com.snackstack.server.dto.RecipeRequestDTO;
 import com.snackstack.server.model.Recipe;
@@ -33,10 +32,8 @@ public class RecipeServiceTest {
   private RecipeStepDAO recipeStepDAO;
   private RecipeIngredientDAO recipeIngredientDAO;
   private IngredientDAO ingredientDAO;
-  private RecipeRequestDAO recipeRequestDAO;
   private RecipeService recipeService;
   private RecipeRequestDTO recipeRequest = new RecipeRequestDTO(null, 1, "Main", null, null);
-  private Integer userId = 1;
 
   @Before
   public void setUp() {
@@ -96,11 +93,10 @@ public class RecipeServiceTest {
     recipeStepDAO = jdbi.onDemand(RecipeStepDAO.class);
     recipeIngredientDAO = jdbi.onDemand(RecipeIngredientDAO.class);
     ingredientDAO = jdbi.onDemand(IngredientDAO.class);
-    recipeRequestDAO = jdbi.onDemand(RecipeRequestDAO.class);
 
     // Initialize the RecipeService with the DAOs and mock recipe generator
     recipeService = new RecipeService(recipeGenerator, recipeDAO, recipeStepDAO,
-        recipeIngredientDAO, ingredientDAO, recipeRequestDAO);
+        recipeIngredientDAO, ingredientDAO);
 
     // populate ingredient database
     List<String> sampleIngredients = List.of(
@@ -119,7 +115,7 @@ public class RecipeServiceTest {
 
   @Test
   public void generateRecipesUsingMock_ShouldStoreToDatabase() {
-    recipeService.generateRecipes(userId, recipeRequest);
+    recipeService.generateRecipes(recipeRequest);
     // check recipe table
     List<Recipe> recipes = recipeDAO.getAllRecipes();
     assertEquals(3, recipes.size());
