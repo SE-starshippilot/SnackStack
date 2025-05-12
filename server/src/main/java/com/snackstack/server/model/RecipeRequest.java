@@ -1,14 +1,12 @@
 package com.snackstack.server.model;
 
-import java.time.Instant;
+import java.util.List;
 
 public record RecipeRequest(
-  Integer recipeRequestId,
-  Integer userId,
-  Integer servings,
-  String recipeType,
-  Instant createdAt
+    int servingSize,
+    String mealType,
+    List<String> preference,
+    List<String> allergies
 ) {
 
 }
-

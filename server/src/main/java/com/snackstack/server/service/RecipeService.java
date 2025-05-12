@@ -3,7 +3,6 @@ package com.snackstack.server.service;
 
 import com.snackstack.server.dao.IngredientDAO;
 import com.snackstack.server.dao.RecipeIngredientDAO;
-import com.snackstack.server.dao.RecipeRequestDAO;
 import com.snackstack.server.dao.RecipeStepDAO;
 import com.snackstack.server.dto.IngredientDTO;
 import com.snackstack.server.dto.RecipeRequestDTO;
@@ -22,17 +21,15 @@ public class RecipeService {
   private final RecipeStepDAO recipeStepDAO;
   private final RecipeIngredientDAO recipeIngredientDAO;
   private final IngredientDAO ingredientDAO;
-  private final RecipeRequestDAO recipeRequestDAO;
 
   public RecipeService(RecipeGenerator recipeGenerator, RecipeDAO recipeDAO,
       RecipeStepDAO recipeStepDAO, RecipeIngredientDAO recipeIngredientDAO,
-      IngredientDAO ingredientDAO, RecipeRequestDAO recipeRequestDAO) {
+      IngredientDAO ingredientDAO) {
     this.recipeGenerator = recipeGenerator;
     this.recipeDAO = recipeDAO;
     this.recipeStepDAO = recipeStepDAO;
     this.recipeIngredientDAO = recipeIngredientDAO;
     this.ingredientDAO = ingredientDAO;
-    this.recipeRequestDAO = recipeRequestDAO;
   }
 
   /**
@@ -43,10 +40,7 @@ public class RecipeService {
    * @return List of generated recipes, all verified to use valid ingredients
    * @throws InvalidIngredientException If any recipe contains invalid ingredients
    */
-  public List<RecipeResponseDTO> generateRecipes(Integer useId, RecipeRequestDTO recipeRequestDTO) {
-    // 1. Save request to DB
-    Integer requestId = recipeRequestDAO.createRequest(useId, recipeRequestDTO);
-
+  public List<RecipeResponseDTO> generateRecipes(RecipeRequestDTO recipeRequestDTO) {
     // 1. Generate recipes using LLM
     List<RecipeResponseDTO> generatedRecipes = this.recipeGenerator.generateRecipe(
         recipeRequestDTO);
