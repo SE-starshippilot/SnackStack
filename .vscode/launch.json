@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "msedge",
+        "request": "launch",
+        "name": "Launch Edge against Vite",
+        "url": "http://localhost:5173",
+        "webRoot": "${workspaceFolder}/client/src",
+        "sourceMapPathOverrides": {
+          "webpack://_N_E/*": "${webRoot}/*",
+          "vite:///*": "${webRoot}/*"
+        }
+      }
+    ]
+  }

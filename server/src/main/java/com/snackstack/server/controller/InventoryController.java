@@ -4,7 +4,6 @@ import static spark.Spark.*;
 
 import com.google.gson.Gson;
 import com.snackstack.server.exceptions.RecordNotFound;
-import com.snackstack.server.model.InventoryItem;
 import com.snackstack.server.service.InventoryService;
 import java.time.Instant;
 import java.util.List;

@@ -44,6 +44,17 @@ public class UserController implements Controller {
         return gson.toJson(new IdResponse(id));
       });
 
+      /* ---- GET /api/users/exists/email/:email ---- (check if exists) */
+      get("/exists/email/:email", (req, res) -> {
+        String email = req.params(":email");
+        logger.info("Received request to check if user exists with email: {}", email);
+
+        long userId = service.getUserIdByEmail(email);
+        logger.debug("User lookup by email result: {}", userId);
+
+        return gson.toJson(new UserExistsResponse(userId));
+      });
+
       /* ---- DELETE /api/users/:name ----  (delete) */
       delete("/:name", (req, res) -> {
         String username = req.params(":name");
@@ -65,4 +76,5 @@ public class UserController implements Controller {
 
   /* small DTOs local to controller layer */
   private record IdResponse(long id) {}
+  private record UserExistsResponse(long id) {}
 }

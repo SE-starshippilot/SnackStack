@@ -61,4 +61,18 @@ public class UserService {
       throw e;
     }
   }
+
+  public int getUserIdByEmail(String email) {
+    try {
+      logger.info("Searching user with email: {}", email);
+      Optional<Integer> uid = dao.getUserIdByName(email);
+      if (uid.isPresent()) {
+        return uid.get();
+      }
+      throw new RecordNotFound("User not found");
+    } catch (Exception e) {
+      logger.error("Error searching user: {}", email, e);
+      return -1;
+    }
+  }
 }

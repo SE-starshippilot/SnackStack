@@ -50,7 +50,7 @@ public interface UserDAO {
   /* CHECK: verify if a user exists by email */
   @SqlQuery("""
       SELECT EXISTS (
-          SELECT 1 
+          SELECT 1
           FROM users 
           WHERE email = :email
       )

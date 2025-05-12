@@ -1,6 +1,5 @@
 package com.snackstack.server.config;
 
-import com.snackstack.server.service.llm.OllamaRecipeGenerator;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
