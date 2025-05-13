@@ -5,7 +5,9 @@ import static spark.Spark.*;
 import com.google.gson.Gson;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.dto.UserDTO;
+import com.snackstack.server.model.User;
 import com.snackstack.server.service.UserService;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,23 @@ public class UserController implements Controller {
         return gson.toJson(new IdResponse(id));
       });
 
+      /* ---- GET /api/users/email/:email ---- (get user by email) */
+      get("/email/:email", (req, res) -> {
+        String email = req.params(":email");
+        logger.info("Received request to get user with email: {}", email);
+
+        Optional<User> user = service.findUserByEmail(email);
+        if (user.isPresent()) {
+          logger.debug("User found with email: {}", email);
+          res.status(200);
+          return gson.toJson(user.get());
+        } else {
+          logger.debug("No user found with email: {}", email);
+          res.status(404);
+          return gson.toJson(new ErrorResponse("User not found"));
+        }
+      });
+
       /* ---- GET /api/users/exists/email/:email ---- (check if exists) */
       get("/exists/email/:email", (req, res) -> {
         String email = req.params(":email");
@@ -54,6 +73,7 @@ public class UserController implements Controller {
 
         return gson.toJson(new UserExistsResponse(userId));
       });
+
 
       /* ---- DELETE /api/users/:name ----  (delete) */
       delete("/:name", (req, res) -> {
@@ -77,4 +97,5 @@ public class UserController implements Controller {
   /* small DTOs local to controller layer */
   private record IdResponse(long id) {}
   private record UserExistsResponse(long id) {}
+  private record ErrorResponse(String message) {}
 }

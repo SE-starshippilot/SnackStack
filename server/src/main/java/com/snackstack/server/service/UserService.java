@@ -4,6 +4,7 @@ package com.snackstack.server.service;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.dto.UserDTO;
 import com.snackstack.server.exceptions.RecordNotFound;
+import com.snackstack.server.model.User;
 import java.time.Instant;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -22,6 +23,15 @@ public class UserService {
   public int createUser(UserDTO req) {
     try {
       logger.info("Creating new user with username: {}", req.userName());
+
+      // Check if user already exists by email
+      Optional<Integer> existingUserId = dao.getUserIdByEmail(req.email());
+      if (existingUserId.isPresent()) {
+        // User already exists, you might want to update some fields here
+        logger.info("User with email {} already exists, returning existing ID", req.email());
+        return existingUserId.get();
+      }
+
       // 1. uniqueness format checks (omitted, maybe will implement later idk)
       // 2. get current time instant
       Instant now = Instant.now();
@@ -34,6 +44,17 @@ public class UserService {
       throw e;
     }
   }
+
+  public Optional<User> findUserByEmail(String email) {
+    try {
+      logger.info("Finding user by email: {}", email);
+      return dao.findByEmail(email);
+    } catch (Exception e) {
+      logger.error("Error finding user by email: {}", email, e);
+      return Optional.empty();
+    }
+  }
+
 
   public int deleteUserByName(UserDTO req) {
     try {
@@ -65,7 +86,7 @@ public class UserService {
   public int getUserIdByEmail(String email) {
     try {
       logger.info("Searching user with email: {}", email);
-      Optional<Integer> uid = dao.getUserIdByName(email);
+      Optional<Integer> uid = dao.getUserIdByEmail(email);
       if (uid.isPresent()) {
         return uid.get();
       }
