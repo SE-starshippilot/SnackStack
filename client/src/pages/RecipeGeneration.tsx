@@ -12,13 +12,16 @@ import { styled } from "@mui/material/styles";
 import React, { useState } from "react";
 import "../styles/recipeGeneration.css";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../contexts/UserContext";
+import { LocationState } from "../types/recipe";
+import axios from "axios";
 
-const mealTypes = [
-  { id: "main", label: "Main" },
-  { id: "appetizer", label: "Appetizer" },
-  { id: "dessert", label: "Dessert" },
-  { id: "breakfast", label: "Breakfast" },
-  { id: "snack", label: "Snack" },
+const recipeTypes = [
+  { id: "MAIN", label: "Main" },
+  { id: "APPETIZER", label: "Appetizer" },
+  { id: "DESSERT", label: "Dessert" },
+  { id: "BREAKFAST", label: "Breakfast" },
+  { id: "SNACK", label: "Snack" },
 ];
 
 const defaultPreferences = [
@@ -78,13 +81,16 @@ const PrettoSlider = styled(Slider)({
 });
 
 function RecipeGeneration() {
+  const { dbUserId } = useUserContext();
+  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     servings: 1,
-    mealType: "",
+    recipeType: "",
     notes: "",
   });
-  const [errors, setErrors] = useState({ servings: false, mealType: false });
+  const [errors, setErrors] = useState({ servings: false, recipeType: false });
 
   const [preferences, setPreferences] = useState<string[]>([]);
   const [preferenceOptions, setPreferenceOptions] = useState<string[]>([
@@ -99,12 +105,6 @@ function RecipeGeneration() {
   ]);
   const [customAllergies, setCustomAllergies] = useState<string[]>([]);
   const [allergyInput, setAllergyInput] = useState<string>("");
-
-  const navigate = useNavigate();
-
-  const gotoRecipesPage = () => {
-    navigate("/recipes");
-  }
 
   const handleChipToggle = (
     value: string,
@@ -146,18 +146,48 @@ function RecipeGeneration() {
     setCustom((prev) => prev.filter((v) => v !== item));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const newErrors = {
       servings: formData.servings < 1,
-      mealType: !formData.mealType,
+      recipeType: !formData.recipeType,
     };
     setErrors(newErrors);
-    if (newErrors.servings || newErrors.mealType) return;
+    if (newErrors.servings || newErrors.recipeType) return;
+
+    if (!dbUserId) {
+      alert("Please sign in first.");
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const payload = {
+        servings: formData.servings,
+        recipeType: formData.recipeType,
+        mealOrigin: preferences,
+        allergies,
+        notes: formData.notes,
+      };
+
+      const { data } = await axios.post(
+        `http://localhost:8080/api/recipes/user/${dbUserId}`,
+        payload,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      /* The controller wraps results as { recipes: […] } */
+      navigate("/recipes", { state: { recipes: data } satisfies LocationState });
+    } catch (err: any) {
+      console.error(err);
+      alert(
+        err?.response?.data?.message ??
+          "Something went wrong while generating recipes."
+      );
+    } finally {
       setIsLoading(false);
-    }, 3000);
+    }
   };
 
   return (
@@ -211,17 +241,17 @@ function RecipeGeneration() {
               What kind of meal? <span className="required">*</span>
             </Typography>
             <Box display="flex" gap={1} flexWrap="wrap">
-              {mealTypes.map((type) => (
+              {recipeTypes.map((type) => (
                 <Chip
                   className="custom-chip"
                   key={type.id}
                   label={type.label}
                   variant={
-                    formData.mealType === type.id ? "filled" : "outlined"
+                    formData.recipeType === type.id ? "filled" : "outlined"
                   }
-                  color={formData.mealType === type.id ? "success" : "default"}
+                  color={formData.recipeType === type.id ? "success" : "default"}
                   onClick={() =>
-                    setFormData((prev) => ({ ...prev, mealType: type.id }))
+                    setFormData((prev) => ({ ...prev, recipeType: type.id }))
                   }
                 />
               ))}
@@ -246,12 +276,12 @@ function RecipeGeneration() {
                   onDelete={
                     customPreferences.includes(pref)
                       ? () =>
-                        handleDeleteCustom(
-                          pref,
-                          setPreferenceOptions,
-                          setCustomPreferences,
-                          setPreferences
-                        )
+                          handleDeleteCustom(
+                            pref,
+                            setPreferenceOptions,
+                            setCustomPreferences,
+                            setPreferences
+                          )
                       : undefined
                   }
                 />
@@ -310,12 +340,12 @@ function RecipeGeneration() {
                   onDelete={
                     customAllergies.includes(allergy)
                       ? () =>
-                        handleDeleteCustom(
-                          allergy,
-                          setAllergyOptions,
-                          setCustomAllergies,
-                          setAllergies
-                        )
+                          handleDeleteCustom(
+                            allergy,
+                            setAllergyOptions,
+                            setCustomAllergies,
+                            setAllergies
+                          )
                       : undefined
                   }
                 />
@@ -376,7 +406,6 @@ function RecipeGeneration() {
               color="success"
               sx={{ px: 4, py: 1.5, fontWeight: 500 }}
               disabled={isLoading}
-              onClick={gotoRecipesPage}
             >
               {isLoading ? (
                 <CircularProgress size={24} sx={{ color: "#fff" }} />

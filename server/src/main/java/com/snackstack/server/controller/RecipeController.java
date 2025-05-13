@@ -5,15 +5,15 @@ import static spark.Spark.*;
 import com.google.gson.Gson;
 import com.snackstack.server.dto.RecipeRequestDTO;
 import com.snackstack.server.dto.RecipeResponseDTO;
-import com.snackstack.server.service.RecipeService;
 import com.snackstack.server.exceptions.InvalidIngredientException;
+import com.snackstack.server.service.RecipeService;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.List;
 
 public class RecipeController implements Controller {
 
-  public static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
+  private static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
   private final RecipeService service;
   private final Gson gson;
 
@@ -23,50 +23,71 @@ public class RecipeController implements Controller {
   }
 
   @Override
+  public String getBasePath() {
+    return "/api/recipes";
+  }
+
+  @Override
   public void registerRoutes() {
     logger.info("Registering Recipe API routes");
 
-    exception(InvalidIngredientException.class, (ex, req, res) -> {
-      res.status(400);
-      res.type("application/json");
-      res.body(gson.toJson(new ErrorResponse(ex.getMessage())));
-    });
-
     path(getBasePath(), () -> {
-      post("", (req, res) -> {
-        logger.info("Received recipe generation request");
-        
+
+      /* =====================================================
+         POST /api/recipes/user/:userId
+         Body: { servings, recipeType, recipeOrigin, allergies }
+         ===================================================== */
+      post("/user/:userId", (req, res) -> {       // <<< changed route
         res.type("application/json");
-        
+
+        /* ----- 1.  Parse path param ----- */
+        String userIdStr = req.params(":userId");
+        Integer userId;
         try {
-          RecipeRequestDTO request = gson.fromJson(req.body(), RecipeRequestDTO.class);
-          if (request == null) {
-            res.status(400);
-            return gson.toJson(new ErrorResponse("Invalid request body"));
-          }
-          
-          List<RecipeResponseDTO> recipes = service.generateRecipes(request);
-          
-          res.status(200);
-          logger.info("Generated {} recipes", recipes.size());
-          return gson.toJson(new SuccessResponse(recipes));
-          
+          userId = Integer.valueOf(userIdStr);
+        } catch (NumberFormatException e) {
+          res.status(400);
+          return gson.toJson(new ErrorResponse("userId must be an integer"));
+        }
+
+        logger.info("Generating recipes for user {}", userId);
+
+        /* ----- 2.  Parse JSON body directly into the public DTO ----- */
+        RecipeRequestDTO apiReq =
+            gson.fromJson(req.body(), RecipeRequestDTO.class);
+
+        if (apiReq == null) {
+          res.status(400);
+          return gson.toJson(new ErrorResponse("Request body is missing or invalid JSON"));
+        }
+        if (apiReq.recipeType() == null) {
+          res.status(400);
+          return gson.toJson(new ErrorResponse("recipeType is required"));
+        }
+
+        /* ----- 3.  Delegate to service ----- */
+        try {
+          List<RecipeResponseDTO> recipes =
+              service.generateRecipeForUser(userId, apiReq);  // your renamed service method
+
+          res.status(201);
+          return gson.toJson(recipes);
+        } catch (IllegalArgumentException | InvalidIngredientException e) {
+          res.status(400);
+          return gson.toJson(new ErrorResponse(e.getMessage()));
         } catch (Exception e) {
-          logger.error("Error processing recipe generation request", e);
+          logger.error("Recipe generation failed", e);
           res.status(500);
-          return gson.toJson(new ErrorResponse("Internal server error: " + e.getMessage()));
+          return gson.toJson(new ErrorResponse("Internal server error"));
         }
       });
+
+      /* ---- add any other recipe routes here ---- */
     });
 
     logger.info("Recipe API routes registered successfully");
   }
 
-  @Override
-  public String getBasePath() {
-    return "/api/recipes/recipe";
-  }
-
-  private record ErrorResponse(String error) {}
-  private record SuccessResponse(List<RecipeResponseDTO> recipes) {}
+  /* small record used for consistent error envelopes */
+  private record ErrorResponse(String message) {}
 }

@@ -5,12 +5,12 @@ import java.util.UUID;
 
 public record RecipeResponseDTO(
     String uuid,
-    String recipe_name,
+    String recipeName,
     int servings,
     String description,
-    String origin_name,
-    List<IngredientDTO> recipe_ingredients,
-    List<String> recipe_steps
+    String originName,
+    List<IngredientDTO> recipeIngredients,
+    List<String> recipeSteps
 ) {
   public RecipeResponseDTO(
       String recipe_name,
