@@ -1,4 +1,3 @@
-// components/Profile.tsx
 import { useUser, RedirectToSignIn, useAuth } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
