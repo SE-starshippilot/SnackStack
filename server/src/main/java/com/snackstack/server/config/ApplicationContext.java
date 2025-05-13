@@ -2,25 +2,10 @@ package com.snackstack.server.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.snackstack.server.controller.Controller;
-import com.snackstack.server.controller.InventoryController;
-import com.snackstack.server.controller.RecipeController;
-import com.snackstack.server.controller.RecipeHistoryController;
-import com.snackstack.server.controller.UserController;
-import com.snackstack.server.dao.IngredientDAO;
-import com.snackstack.server.dao.InventoryDAO;
-import com.snackstack.server.dao.RecipeDAO;
-import com.snackstack.server.dao.RecipeHistoryDAO;
-import com.snackstack.server.dao.RecipeIngredientDAO;
-import com.snackstack.server.dao.RecipeStepDAO;
-import com.snackstack.server.dao.UserDAO;
-import com.snackstack.server.service.InventoryService;
-import com.snackstack.server.service.RecipeGenerator;
-import com.snackstack.server.service.RecipeHistoryService;
-import com.snackstack.server.service.RecipeService;
-import com.snackstack.server.service.UserService;
-import com.snackstack.server.service.llm.MockRecipeGenerator;
-import com.snackstack.server.service.llm.OllamaRecipeGenerator;
+import com.snackstack.server.controller.*;
+import com.snackstack.server.dao.*;
+import com.snackstack.server.service.*;
+import com.snackstack.server.service.llm.*;
 import com.snackstack.server.utils.InstantTypeAdapter;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -36,17 +21,20 @@ public class ApplicationContext implements AutoCloseable {
   private final DBConfig dbConfig;
   private OllamaConfig ollamaConfig;
   private final Gson gson;
+  // DAOs
   private final UserDAO userDAO;
   private final InventoryDAO inventoryDAO;
   private final IngredientDAO ingredientDAO;
+  private final RecipeDAO recipeDAO;
+  private final RecipeIngredientDAO recipeIngredientDAO;
+  private final RecipeHistoryDAO recipeHistoryDAO;
+  private final RecipeStepDAO recipeStepDAO;
+
   private final RecipeGenerator recipeGenerator;
+  // Services
   private final UserService userService;
   private final InventoryService inventoryService;
-  private final RecipeHistoryDAO recipeHistoryDAO;
   private final RecipeHistoryService recipeHistoryService;
-  private final RecipeDAO recipeDAO;
-  private final RecipeStepDAO recipeStepDAO;
-  private final RecipeIngredientDAO recipeIngredientDAO;
   private final RecipeService recipeService;
   private final List<Controller> controllers = new ArrayList<>();
 
@@ -117,13 +105,26 @@ public class ApplicationContext implements AutoCloseable {
     return inventoryDAO;
   }
 
+  public IngredientDAO getIngredientDAO() {
+    return ingredientDAO;
+  }
+
+
+  public RecipeIngredientDAO getRecipeIngredientDAO() {
+    return recipeIngredientDAO;
+  }
+
+
   public UserService getUserService() {
     return userService;
   }
 
-  public InventoryService getInventoryService() {
-    return inventoryService;
+  public InventoryService getInventoryService() {return inventoryService;}
+
+  public RecipeService getRecipesService() {
+    return recipeService;
   }
+
 
   @Override
   public void close() {

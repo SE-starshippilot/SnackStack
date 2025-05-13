@@ -2,7 +2,8 @@
     "success": true,
     "message": "success",
     "recipes": [
-      {
+      { 
+        "recipe_id": 1,
         "recipe_name": "Spaghetti Carbonara",
         "servings": 4,
         "description": "A classic Italian pasta dish made with eggs, cheese, pancetta, and pepper.",
@@ -49,6 +50,7 @@
         ]
       },
       {
+        "recipe_id": 2,
         "recipe_name": "Chicken Tikka Masala",
         "servings": 4,
         "description": "A flavorful and creamy Indian dish with marinated chicken in a spiced tomato gravy.",
@@ -94,7 +96,8 @@
           "Serve hot with basmati rice or naan bread."
         ]
       },
-      {
+      { 
+        "recipe_id": 3,
         "recipe_name": "Classic Pancakes",
         "servings": 2,
         "description": "Fluffy and delicious breakfast pancakes, perfect with syrup or fresh fruits.",
