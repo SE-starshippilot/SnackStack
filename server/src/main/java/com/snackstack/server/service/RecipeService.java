@@ -2,9 +2,11 @@ package com.snackstack.server.service;
 
 
 import com.snackstack.server.dao.IngredientDAO;
+import com.snackstack.server.dao.InventoryDAO;
 import com.snackstack.server.dao.RecipeIngredientDAO;
 import com.snackstack.server.dao.RecipeStepDAO;
 import com.snackstack.server.dto.IngredientDTO;
+import com.snackstack.server.dto.RecipeGenerationDTO;
 import com.snackstack.server.dto.RecipeRequestDTO;
 import com.snackstack.server.dto.RecipeResponseDTO;
 import com.snackstack.server.dao.RecipeDAO;
@@ -21,36 +23,58 @@ public class RecipeService {
   private final RecipeStepDAO recipeStepDAO;
   private final RecipeIngredientDAO recipeIngredientDAO;
   private final IngredientDAO ingredientDAO;
+  private final InventoryDAO inventoryDAO;
 
   public RecipeService(RecipeGenerator recipeGenerator, RecipeDAO recipeDAO,
       RecipeStepDAO recipeStepDAO, RecipeIngredientDAO recipeIngredientDAO,
-      IngredientDAO ingredientDAO) {
+      IngredientDAO ingredientDAO, InventoryDAO inventoryDAO) {
     this.recipeGenerator = recipeGenerator;
     this.recipeDAO = recipeDAO;
     this.recipeStepDAO = recipeStepDAO;
     this.recipeIngredientDAO = recipeIngredientDAO;
     this.ingredientDAO = ingredientDAO;
+    this.inventoryDAO = inventoryDAO;
   }
 
   /**
-   * Generates recipes and saves them to the database. The entire operation is atomic - if any
-   * ingredient in any recipe doesn't exist, no recipes will be saved.
+   * Generate recipes given the user id and the front end request
    *
-   * @param recipeRequestDTO The recipe generation request
+   * @param userId The user's id we are generating recipe for
+   * @param req    The recipe generation request
    * @return List of generated recipes, all verified to use valid ingredients
    * @throws InvalidIngredientException If any recipe contains invalid ingredients
    */
-  public List<RecipeResponseDTO> generateRecipes(RecipeRequestDTO recipeRequestDTO) {
+  public List<RecipeResponseDTO> generateRecipeForUser(Integer userId,
+      RecipeRequestDTO req) {
+
+    // 1. Fetch the ingredients the user have
+    List<String> userIngredients = getUserIngredients(userId);
+    if (userIngredients.isEmpty()) {
+      throw new IllegalArgumentException("The user inventory is empty.");
+    }
+
+    // 2.  compose the *internal* DTO handed to the generator
+    RecipeGenerationDTO genDTO = new RecipeGenerationDTO(
+        userIngredients,
+        req.servings(),
+        req.recipeType(),
+        req.recipeOrigin(),
+        req.allergies()
+    );
+    return generateAndSaveRecipe(genDTO);
+  }
+
+  public List<RecipeResponseDTO> generateAndSaveRecipe(RecipeGenerationDTO recipeGenerationDTO) {
     // 1. Generate recipes using LLM
     List<RecipeResponseDTO> generatedRecipes = this.recipeGenerator.generateRecipe(
-        recipeRequestDTO);
+        recipeGenerationDTO);
 
     // 2. Validate all recipes have valid ingredients before saving any
     validateAllRecipeIngredients(generatedRecipes);
 
     // 3. Save all recipes in a transaction
     for (RecipeResponseDTO recipe : generatedRecipes) {
-      saveRecipe(recipe, recipeRequestDTO);
+      saveRecipe(recipe, recipeGenerationDTO);
     }
     return generatedRecipes;
   }
@@ -65,8 +89,8 @@ public class RecipeService {
     List<String> invalidIngredients = new ArrayList<>();
 
     for (RecipeResponseDTO recipe : recipes) {
-      for (IngredientDTO ingredientDTO : recipe.recipe_ingredients()) {
-        String ingredientName = ingredientDTO.ingredient_name();
+      for (IngredientDTO ingredientDTO : recipe.recipeIngredients()) {
+        String ingredientName = ingredientDTO.ingredientName();
         if (!ingredientDAO.ingredientExists(ingredientName)) {
           invalidIngredients.add(ingredientName);
         }
@@ -83,31 +107,31 @@ public class RecipeService {
   /**
    * Saves a single recipe with its steps and ingredients
    *
-   * @param recipeResponse   The recipe to save
-   * @param recipeRequest The original request
+   * @param recipeResponse The recipe to save
+   * @param recipeRequest  The original request
    * @return The ID of the saved recipe
    */
-  private void saveRecipe(RecipeResponseDTO recipeResponse, RecipeRequestDTO recipeRequest) {
+  private void saveRecipe(RecipeResponseDTO recipeResponse, RecipeGenerationDTO recipeRequest) {
     // 1. Save recipe
     int recipeId = recipeDAO.addRecipe(
-        recipeResponse.recipe_name(),
+        recipeResponse.recipeName(),
         recipeResponse.description(),
         recipeRequest.servings(),
-        recipeResponse.origin_name(),
-        recipeRequest.meal_type().toLowerCase(),
+        recipeResponse.originName(),
+        recipeRequest.recipeType(),
         recipeResponse.uuid()
     );
 
     // 2. Save recipe steps
-    List<Integer> stepNumbers = IntStream.rangeClosed(1, recipeResponse.recipe_steps().size())
+    List<Integer> stepNumbers = IntStream.rangeClosed(1, recipeResponse.recipeSteps().size())
         .boxed()
         .toList();
-    recipeStepDAO.addStepsForRecipe(recipeId, stepNumbers, recipeResponse.recipe_steps());
+    recipeStepDAO.addStepsForRecipe(recipeId, stepNumbers, recipeResponse.recipeSteps());
 
     // 3. Save recipe ingredients
-    for (IngredientDTO ingredient : recipeResponse.recipe_ingredients()) {
+    for (IngredientDTO ingredient : recipeResponse.recipeIngredients()) {
       // Get ingredient ID - we know it exists because we validated earlier
-      Integer ingredientId = ingredientDAO.getIngredientIdByName(ingredient.ingredient_name());
+      Integer ingredientId = ingredientDAO.getIngredientIdByName(ingredient.ingredientName());
 
       // Add to recipe_ingredients table
       recipeIngredientDAO.addIngredientToRecipe(
@@ -130,4 +154,17 @@ public class RecipeService {
     return recipeDAO.deleteRecipeByUuid(uuid) > 0;
   }
 
+  /**
+   * Fetches ingredient names from a user's inventory
+   *
+   * @param userId The user ID whose inventory ingredients will be fetched
+   * @return List of ingredient names from the user's inventory
+   */
+  public List<String> getUserIngredients(long userId) {
+    // Convert long to Integer since DAO methods use Integer
+    Integer userIdInt = (int) userId;
+
+    // Use the existing method in InventoryDAO that already does the join with ingredients table
+    return inventoryDAO.getUserIngredientNames(userIdInt);
+  }
 }

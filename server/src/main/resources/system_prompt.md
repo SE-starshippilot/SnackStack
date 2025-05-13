@@ -52,148 +52,148 @@ Your job is to provide user with a list of possible recipes they can cook given 
 
 ```json
 {
-  "success": true,
-  "message": "success",
-  "recipes": [
-    {
-      "recipe_name": "Spaghetti Carbonara",
-      "servings": 4,
-      "description": "A classic Italian pasta dish made with eggs, cheese, pancetta, and pepper.",
-      "origin_name": "Italian",
-      "recipe_ingredients": [
-        {
-          "ingredient_name": "Spaghetti",
-          "quantity": 400.00,
-          "unit": "grams",
-          "note": "Use high-quality durum wheat pasta for the best results."
-        },
-        {
-          "ingredient_name": "Pancetta",
-          "quantity": 150.00,
-          "unit": "grams",
-          "note": "Can substitute with guanciale or bacon if unavailable."
-        },
-        {
-          "ingredient_name": "Eggs",
-          "quantity": 3.00,
-          "unit": null,
-          "note": "Use large eggs."
-        },
-        {
-          "ingredient_name": "Parmesan Cheese",
-          "quantity": 100.00,
-          "unit": "grams",
-          "note": "Grated."
-        },
-        {
-          "ingredient_name": "Ground Black Pepper",
-          "quantity": 2.00,
-          "unit": "teaspoons",
-          "note": "Freshly ground for better flavor."
-        }
-      ],
-      "recipe_steps": [
-        "Cook the spaghetti in a large pot of salted boiling water until al dente.",
-        "In a bowl, whisk together the eggs and grated Parmesan cheese.",
-        "In a large skillet, cook the pancetta over medium heat until crispy.",
-        "Drain the spaghetti and add it to the skillet with the pancetta. Toss to coat.",
-        "Remove from heat and quickly stir in the egg and cheese mixture, ensuring the pasta is coated.",
-        "Season with freshly ground black pepper and serve immediately."
-      ]
-    },
-    {
-      "recipe_name": "Chicken Tikka Masala",
-      "servings": 4,
-      "description": "A flavorful and creamy Indian dish with marinated chicken in a spiced tomato gravy.",
-      "origin_name": "Indian",
-      "recipe_ingredients": [
-        {
-          "ingredient_name": "Chicken Breast",
-          "quantity": 500.00,
-          "unit": "grams",
-          "note": "Cut into bite-sized pieces."
-        },
-        {
-          "ingredient_name": "Yogurt",
-          "quantity": 200.00,
-          "unit": "grams",
-          "note": "Plain yogurt for marinating the chicken."
-        },
-        {
-          "ingredient_name": "Garam Masala",
-          "quantity": 1.50,
-          "unit": "tablespoons",
-          "note": "Adjust according to spice preference."
-        },
-        {
-          "ingredient_name": "Tomato Puree",
-          "quantity": 400.00,
-          "unit": "grams",
-          "note": "Canned puree works well."
-        },
-        {
-          "ingredient_name": "Heavy Cream",
-          "quantity": 150.00,
-          "unit": "ml",
-          "note": "For a rich and creamy sauce."
-        }
-      ],
-      "recipe_steps": [
-        "Marinate the chicken with yogurt and garam masala for at least 1 hour.",
-        "In a skillet, cook the chicken until browned and set aside.",
-        "In the same skillet, add tomato puree and cook until the oil separates.",
-        "Stir in heavy cream and season with salt and additional spices as needed.",
-        "Add the cooked chicken to the sauce and simmer for 10-15 minutes.",
-        "Serve hot with basmati rice or naan bread."
-      ]
-    },
-    {
-      "recipe_name": "Classic Pancakes",
-      "servings": 2,
-      "description": "Fluffy and delicious breakfast pancakes, perfect with syrup or fresh fruits.",
-      "origin_name": "American",
-      "recipe_ingredients": [
-        {
-          "ingredient_name": "All-Purpose Flour",
-          "quantity": 200.00,
-          "unit": "grams",
-          "note": "Sifted for a lighter texture."
-        },
-        {
-          "ingredient_name": "Milk",
-          "quantity": 250.00,
-          "unit": "ml",
-          "note": "Whole milk is ideal."
-        },
-        {
-          "ingredient_name": "Eggs",
-          "quantity": 1.00,
-          "unit": null,
-          "note": "Large egg."
-        },
-        {
-          "ingredient_name": "Butter",
-          "quantity": 50.00,
-          "unit": "grams",
-          "note": "Melted, for the batter and greasing the pan."
-        },
-        {
-          "ingredient_name": "Baking Powder",
-          "quantity": 1.00,
-          "unit": "teaspoon",
-          "note": "For fluffiness."
-        }
-      ],
-      "recipe_steps": [
-        "In a bowl, mix the flour, baking powder, and a pinch of salt.",
-        "Whisk in the milk, egg, and melted butter until smooth.",
-        "Heat a non-stick pan and grease lightly with butter.",
-        "Pour a ladle of batter onto the pan and cook until bubbles form on the surface.",
-        "Flip the pancake and cook until golden brown.",
-        "Serve warm with syrup, butter, or fresh fruits."
-      ]
-    }
-  ]
+   "success": true,
+   "message": "success",
+   "recipes": [
+      {
+         "recipeName": "Spaghetti Carbonara",
+         "servings": 4,
+         "description": "A classic Italian pasta dish made with eggs, cheese, pancetta, and pepper.",
+         "originName": "Italian",
+         "recipeInrgedients": [
+            {
+               "ingredientName": "Spaghetti",
+               "quantity": 400.00,
+               "unit": "grams",
+               "note": "Use high-quality durum wheat pasta for the best results."
+            },
+            {
+               "ingredientName": "Pancetta",
+               "quantity": 150.00,
+               "unit": "grams",
+               "note": "Can substitute with guanciale or bacon if unavailable."
+            },
+            {
+               "ingredientName": "Eggs",
+               "quantity": 3.00,
+               "unit": null,
+               "note": "Use large eggs."
+            },
+            {
+               "ingredientName": "Parmesan Cheese",
+               "quantity": 100.00,
+               "unit": "grams",
+               "note": "Grated."
+            },
+            {
+               "ingredientName": "Ground Black Pepper",
+               "quantity": 2.00,
+               "unit": "teaspoons",
+               "note": "Freshly ground for better flavor."
+            }
+         ],
+         "recipeSteps": [
+            "Cook the spaghetti in a large pot of salted boiling water until al dente.",
+            "In a bowl, whisk together the eggs and grated Parmesan cheese.",
+            "In a large skillet, cook the pancetta over medium heat until crispy.",
+            "Drain the spaghetti and add it to the skillet with the pancetta. Toss to coat.",
+            "Remove from heat and quickly stir in the egg and cheese mixture, ensuring the pasta is coated.",
+            "Season with freshly ground black pepper and serve immediately."
+         ]
+      },
+      {
+         "recipeName": "Chicken Tikka Masala",
+         "servings": 4,
+         "description": "A flavorful and creamy Indian dish with marinated chicken in a spiced tomato gravy.",
+         "originName": "Indian",
+         "recipeInrgedients": [
+            {
+               "ingredientName": "Chicken Breast",
+               "quantity": 500.00,
+               "unit": "grams",
+               "note": "Cut into bite-sized pieces."
+            },
+            {
+               "ingredientName": "Yogurt",
+               "quantity": 200.00,
+               "unit": "grams",
+               "note": "Plain yogurt for marinating the chicken."
+            },
+            {
+               "ingredientName": "Garam Masala",
+               "quantity": 1.50,
+               "unit": "tablespoons",
+               "note": "Adjust according to spice preference."
+            },
+            {
+               "ingredientName": "Tomato Puree",
+               "quantity": 400.00,
+               "unit": "grams",
+               "note": "Canned puree works well."
+            },
+            {
+               "ingredientName": "Heavy Cream",
+               "quantity": 150.00,
+               "unit": "ml",
+               "note": "For a rich and creamy sauce."
+            }
+         ],
+         "recipeSteps": [
+            "Marinate the chicken with yogurt and garam masala for at least 1 hour.",
+            "In a skillet, cook the chicken until browned and set aside.",
+            "In the same skillet, add tomato puree and cook until the oil separates.",
+            "Stir in heavy cream and season with salt and additional spices as needed.",
+            "Add the cooked chicken to the sauce and simmer for 10-15 minutes.",
+            "Serve hot with basmati rice or naan bread."
+         ]
+      },
+      {
+         "recipeName": "Classic Pancakes",
+         "servings": 2,
+         "description": "Fluffy and delicious breakfast pancakes, perfect with syrup or fresh fruits.",
+         "originName": "American",
+         "recipeInrgedients": [
+            {
+               "ingredientName": "All-Purpose Flour",
+               "quantity": 200.00,
+               "unit": "grams",
+               "note": "Sifted for a lighter texture."
+            },
+            {
+               "ingredientName": "Milk",
+               "quantity": 250.00,
+               "unit": "ml",
+               "note": "Whole milk is ideal."
+            },
+            {
+               "ingredientName": "Eggs",
+               "quantity": 1.00,
+               "unit": null,
+               "note": "Large egg."
+            },
+            {
+               "ingredientName": "Butter",
+               "quantity": 50.00,
+               "unit": "grams",
+               "note": "Melted, for the batter and greasing the pan."
+            },
+            {
+               "ingredientName": "Baking Powder",
+               "quantity": 1.00,
+               "unit": "teaspoon",
+               "note": "For fluffiness."
+            }
+         ],
+         "recipeSteps": [
+            "In a bowl, mix the flour, baking powder, and a pinch of salt.",
+            "Whisk in the milk, egg, and melted butter until smooth.",
+            "Heat a non-stick pan and grease lightly with butter.",
+            "Pour a ladle of batter onto the pan and cook until bubbles form on the surface.",
+            "Flip the pancake and cook until golden brown.",
+            "Serve warm with syrup, butter, or fresh fruits."
+         ]
+      }
+   ]
 }
 ```
 

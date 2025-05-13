@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.snackstack.server.config.OllamaConfig;
-import com.snackstack.server.dto.RecipeRequestDTO;
+import com.snackstack.server.dto.RecipeGenerationDTO;
 import com.snackstack.server.dto.RecipeResponseDTO;
 import com.snackstack.server.exceptions.LLMServiceException;
 import com.snackstack.server.service.RecipeGenerator;
@@ -36,7 +36,7 @@ public class OllamaRecipeGenerator implements RecipeGenerator {
 
 
   @Override
-  public List<RecipeResponseDTO> generateRecipe(RecipeRequestDTO recipeRequest)
+  public List<RecipeResponseDTO> generateRecipe(RecipeGenerationDTO recipeRequest)
       throws LLMServiceException {
     try {
       String userPrompt = gson.toJson(recipeRequest);

@@ -155,7 +155,7 @@ public interface InventoryDAO {
   /*DELETE: Delete an item from database*/
   /**
    * Removes an ingredient from a user's inventory by ingredient name.
-   * Note: This method relies on the ingredient_name column which is not in this table,
+   * Note: This method relies on the ingredientName column which is not in this table,
    * so it might require a join or subquery in the actual implementation.
    *
    * @param userId The ID of the user

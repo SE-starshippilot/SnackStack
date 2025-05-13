@@ -3,7 +3,6 @@ package com.snackstack.server.controller;
 import static spark.Spark.*;
 
 import com.google.gson.Gson;
-import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.dto.UserDTO;
 import com.snackstack.server.model.User;
 import com.snackstack.server.service.UserService;

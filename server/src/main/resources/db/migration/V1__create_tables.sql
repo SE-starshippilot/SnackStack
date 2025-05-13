@@ -36,7 +36,7 @@ CREATE TABLE inventory_items
     purchase_date     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TYPE recipe_type AS ENUM ('main', 'appetizer', 'dessert', 'breakfast', 'snack');
+CREATE TYPE recipe_type AS ENUM ('MAIN', 'APPETIZER', 'DESSERT', 'BREAKFAST', 'SNACK');
 
 CREATE TABLE recipes
 (

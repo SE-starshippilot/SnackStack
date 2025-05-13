@@ -1,10 +1,8 @@
 package com.snackstack.server.dao;
 
-import com.snackstack.server.model.Recipe;
 import com.snackstack.server.model.User;
 import java.time.Instant;
 import java.util.Optional;
-import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.*;

@@ -79,9 +79,8 @@ public class UserServiceTest {
   @Test
   public void deleteUserByName_ShouldRemoveUserFromDatabase() {
     int id = userService.createUser(sampleUser);
-    int rowsAffected = userService.deleteUserByName(sampleUser);
-
-    assertEquals("Should affect exactly 1 row", 1, rowsAffected);
+    boolean success = userService.deleteUserByUsername(sampleUser.userName());
+    assertTrue("User should be deleted successfully", success);
     assertFalse("User should not exist after deletion", userDAO.userExistsById(id));
     assertFalse("User should not be found by username after deletion",
         userDAO.userExistsByName(sampleUserName));
@@ -89,8 +88,8 @@ public class UserServiceTest {
 
   @Test
   public void deleteUserByName_WithNonExistentUser_ShouldReturnZeroRowsAffected() {
-    int rowsAffected = userService.deleteUserByName(sampleUser);
-    assertEquals("Should affect 0 rows when deleting non-existent user", 0, rowsAffected);
+    boolean success = userService.deleteUserByUsername(sampleUser.userName());
+    assertFalse(success);
   }
 
 }
