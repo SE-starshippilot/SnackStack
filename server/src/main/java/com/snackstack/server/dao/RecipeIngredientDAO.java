@@ -24,10 +24,10 @@ public interface RecipeIngredientDAO {
         INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit, note)
         VALUES (:recipeId, :ingredientId, :quantity, :unit, :note)
         """)
-  int addIngredientToRecipe(
-      @Bind("recipeId") int recipeId,
-      @Bind("ingredientId") int ingredientId,
-      @Bind("quantity") float quantity,
+  Integer addIngredientToRecipe(
+      @Bind("recipeId") Integer recipeId,
+      @Bind("ingredientId") Integer ingredientId,
+      @Bind("quantity") Float quantity,
       @Bind("unit") String unit,
       @Bind("note") String note
   );
@@ -68,5 +68,5 @@ public interface RecipeIngredientDAO {
         FROM recipe_ingredients ri
         WHERE ri.recipe_id = :recipeId
         """)
-  List<RecipeIngredient> getIngredientsForRecipe(@Bind("recipeId") int recipeId);
+  List<RecipeIngredient> getIngredientsForRecipe(@Bind("recipeId") Integer recipeId);
 }

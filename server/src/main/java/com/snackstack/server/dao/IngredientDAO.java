@@ -2,7 +2,7 @@ package com.snackstack.server.dao;
 
 import com.snackstack.server.model.Ingredient;
 import java.util.List;
-import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
+import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
@@ -14,7 +14,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
  * Provides methods to create, read, update, and delete ingredient records.
  * Uses JDBI SQL object API for database operations.
  */
-@RegisterBeanMapper(Ingredient.class)
+@RegisterConstructorMapper(Ingredient.class)
 public interface IngredientDAO {
 
   /*CREATE*/
