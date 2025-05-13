@@ -1,6 +1,5 @@
 package com.snackstack.server.config;
 
-import com.snackstack.server.service.llm.OllamaRecipeGenerator;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,7 @@ public class AppConfig {
   private static AppConfig instance;
 
   private AppConfig() {
-    this.dotenv = Dotenv.configure().directory("server").filename(".env").load();
+    this.dotenv = Dotenv.configure().directory(".").filename(".env").load();
   }
 
   public static synchronized AppConfig getInstance() {

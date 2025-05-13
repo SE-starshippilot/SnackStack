@@ -1,8 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      <pattern>%d{HH:mm:ss} %-5level %logger{0} - %msg%n</pattern>
     </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -12,16 +16,21 @@
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
 
-  <!-- Set default logging level and appenders -->
-  <root level="INFO">
+  <logger name="org.eclipse.jetty" level="ERROR" />
+  <logger name="spark" level="ERROR" />
+  <logger name="org.jdbi" level="ERROR" />
+  <logger name="com.zaxxer.hikari" level="ERROR" />
+  
+  <logger name="com.snackstack.server" level="INFO">
     <appender-ref ref="CONSOLE" />
     <appender-ref ref="FILE" />
-  </root>
+  </logger>
 
-  <!-- Set specific levels for your packages -->
-  <logger name="com.snackstack.server" level="INFO" />
+  <root level="ERROR">
+    <appender-ref ref="FILE" />
+  </root>
 </configuration>

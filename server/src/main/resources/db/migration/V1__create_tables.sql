@@ -5,6 +5,9 @@ DROP TABLE IF EXISTS recipes CASCADE;
 DROP TABLE IF EXISTS inventory_items CASCADE;
 DROP TABLE IF EXISTS ingredients CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS recipe_generation_requests CASCADE;
+DROP TABLE IF EXISTS request_preferences CASCADE;
+DROP TABLE IF EXISTS request_allergies CASCADE;
 DROP TYPE IF EXISTS recipe_type;
 
 CREATE TABLE users
@@ -22,7 +25,6 @@ CREATE TABLE ingredients
     ingredient_name varchar(255) NOT NULL UNIQUE
 );
 
-
 CREATE TABLE inventory_items
 (
     inventory_item_id SERIAL PRIMARY KEY,
@@ -34,7 +36,7 @@ CREATE TABLE inventory_items
     purchase_date     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TYPE recipe_type AS ENUM ('Main', 'Appetizer', 'Dessert', 'Breakfast', 'Snack');
+CREATE TYPE recipe_type AS ENUM ('main', 'appetizer', 'dessert', 'breakfast', 'snack');
 
 CREATE TABLE recipes
 (
@@ -43,45 +45,63 @@ CREATE TABLE recipes
     description      TEXT,
     servings         INT,
     recipe_origin_id VARCHAR(16),
-    recipe_type recipe_type,
-    is_favorite BOOLEAN DEFAULT false,
-    uuid VARCHAR(32) NOT NULL UNIQUE
+    recipe_type      recipe_type,
+    is_favorite      BOOLEAN DEFAULT false,
+    uuid             VARCHAR(36) NOT NULL UNIQUE
 );
 
 CREATE TABLE recipe_history
 (
-    history_id SERIAL PRIMARY KEY,
-    user_id    INT         NOT NULL
-        REFERENCES users (user_id)
-            ON DELETE CASCADE,
-    recipe_id  INT         NOT NULL
-        REFERENCES recipes (recipe_id),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    history_id  SERIAL PRIMARY KEY,
+    user_id     INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    recipe_id   INT NOT NULL REFERENCES recipes(recipe_id) ON DELETE CASCADE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE recipe_steps
 (
     step_id          SERIAL PRIMARY KEY,
-    recipe_id        INT  NOT NULL
-        REFERENCES recipes (recipe_id)
-            ON DELETE CASCADE,
-    step_number      INT  NOT NULL,
+    recipe_id        INT NOT NULL REFERENCES recipes(recipe_id) ON DELETE CASCADE,
+    step_number      INT NOT NULL,
     step_description TEXT NOT NULL,
     UNIQUE (recipe_id, step_number)
 );
 
 CREATE TABLE recipe_ingredients
 (
-    recipe_id     INT NOT NULL
-        REFERENCES recipes (recipe_id)
-            ON DELETE CASCADE,
-    ingredient_id INT NOT NULL
-        REFERENCES ingredients (ingredient_id)
-            ON DELETE RESTRICT,
-    quantity      DECIMAL(10, 2) NOT NULL ,
+    recipe_id     INT NOT NULL REFERENCES recipes(recipe_id) ON DELETE CASCADE,
+    ingredient_id INT NOT NULL REFERENCES ingredients(ingredient_id) ON DELETE RESTRICT,
+    quantity      DECIMAL(10, 2) NOT NULL,
     unit          VARCHAR(50),
     note          TEXT,
     PRIMARY KEY (recipe_id, ingredient_id)
 );
+
+CREATE TABLE recipe_generation_requests (
+    request_id SERIAL PRIMARY KEY,
+    history_id INTEGER NOT NULL REFERENCES recipe_history(history_id) ON DELETE CASCADE,
+    servings INTEGER NOT NULL,
+    meal_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    CONSTRAINT valid_servings CHECK (servings BETWEEN 1 AND 10)
+);
+
+CREATE TABLE request_preferences (
+    request_id INTEGER REFERENCES recipe_generation_requests(request_id) ON DELETE CASCADE,
+    preference VARCHAR(100) NOT NULL,
+    PRIMARY KEY (request_id, preference)
+);
+
+CREATE TABLE request_allergies (
+    request_id INTEGER REFERENCES recipe_generation_requests(request_id) ON DELETE CASCADE,
+    allergy VARCHAR(100) NOT NULL,
+    PRIMARY KEY (request_id, allergy)
+);
+
+CREATE INDEX idx_recipe_history_user ON recipe_history(user_id);
+CREATE INDEX idx_recipe_history_recipe ON recipe_history(recipe_id);
+CREATE INDEX idx_recipe_requests_history ON recipe_generation_requests(history_id);
+CREATE INDEX idx_request_preferences ON request_preferences(request_id);
+CREATE INDEX idx_request_allergies ON request_allergies(request_id);
 
 

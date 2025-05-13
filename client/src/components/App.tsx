@@ -8,59 +8,86 @@ import Home from "./Home";
 import { Navbar } from "./Navbar";
 import RecipesPage from "../pages/RecipesPage";
 import HistoryRecipes from "../pages/HistoryRecipes";
-
-import { SignedIn } from "@clerk/clerk-react";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { UserProvider } from "../contexts/UserContext";
 
 const disableAuth = import.meta.env.VITE_DISABLE_AUTH === "true";
 
 function App() {
   return (
     <Router>
-      <div className="container">
-        {/* only render Navbar; it now handles auth-controls itself */}
-        <header>
-          <Navbar disableAuth={disableAuth} />
-        </header>
+      <UserProvider>
+        <div className="container">
+          <header>
+            <Navbar disableAuth={disableAuth} />
+          </header>
 
-        <div className="main-content">
-          <Routes>
-            {!disableAuth && (
-              <Route path="/complete-profile" element={<Profile />} />
-            )}
-            <Route path="/" element={<Home />} />
-            <Route path="/recipes" element={<RecipesPage />} />
-            <Route path="/history" element={<HistoryRecipes />} />
+          <div className="main-content">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
+              {!disableAuth && (
+                <Route path="/complete-profile" element={<Profile />} />
+              )}
+              
+              {/* Protected routes */}
+              <Route
+                path="/recipes"
+                element={
+                  disableAuth ? (
+                    <RecipesPage />
+                  ) : (
+                    <ProtectedRoute>
+                      <RecipesPage />
+                    </ProtectedRoute>
+                  )
+                }
+              />
+              
+              <Route
+                path="/history"
+                element={
+                  disableAuth ? (
+                    <HistoryRecipes />
+                  ) : (
+                    <ProtectedRoute>
+                      <HistoryRecipes />
+                    </ProtectedRoute>
+                  )
+                }
+              />
 
-            <Route
-              path="/inventory"
-              element={
-                disableAuth ? (
-                  <InventoryManagement />
-                ) : (
-                  <SignedIn>
+              <Route
+                path="/inventory"
+                element={
+                  disableAuth ? (
                     <InventoryManagement />
-                  </SignedIn>
-                )
-              }
-            />
+                  ) : (
+                    <ProtectedRoute>
+                      <InventoryManagement />
+                    </ProtectedRoute>
+                  )
+                }
+              />
 
-            <Route
-              path="/cook"
-              element={
-                disableAuth ? (
-                  <RecipeGeneration />
-                ) : (
-                  <SignedIn>
+              <Route
+                path="/cook"
+                element={
+                  disableAuth ? (
                     <RecipeGeneration />
-                  </SignedIn>
-                )
-              }
-            />
-          </Routes>
-        </div>
+                  ) : (
+                    <ProtectedRoute>
+                      <RecipeGeneration />
+                    </ProtectedRoute>
+                  )
+                }
+              />
+            </Routes>
+          </div>
 
-        <Footer />
-      </div>
+          <Footer />
+        </div>
+      </UserProvider>
     </Router>
   );
 }

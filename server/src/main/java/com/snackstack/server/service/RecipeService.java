@@ -94,7 +94,7 @@ public class RecipeService {
         recipeResponse.description(),
         recipeRequest.servings(),
         recipeResponse.origin_name(),
-        recipeRequest.meal_type(),
+        recipeRequest.meal_type().toLowerCase(),
         recipeResponse.uuid()
     );
 
@@ -118,7 +118,6 @@ public class RecipeService {
           ingredient.note()
       );
     }
-
   }
 
   /**
