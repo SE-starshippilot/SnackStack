@@ -14,12 +14,10 @@ import org.slf4j.LoggerFactory;
 public class UserController implements Controller {
 
   private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-  private final UserDAO dao;
   private final UserService service;
   private final Gson gson;
 
-  public UserController(UserDAO dao, UserService service, Gson gson) {
-    this.dao = dao;
+  public UserController(UserService service, Gson gson) {
     this.service = service;
     this.gson = gson;
   }
@@ -80,7 +78,7 @@ public class UserController implements Controller {
         String username = req.params(":name");
         logger.info("Received request to delete user: {}", username);
 
-        boolean ok = dao.deleteByName(username) == 1;
+        boolean ok = service.deleteUserByUsername(username);
         if (!ok) {
           logger.warn("User not found for deletion: {}", username);
           halt(404, "User not found");

@@ -56,14 +56,14 @@ public class UserService {
   }
 
 
-  public int deleteUserByName(UserDTO req) {
+  public boolean deleteUserByUsername(String username) {
     try {
-      logger.info("Deleting user with username: {}", req.userName());
-      int rowsAffected = dao.deleteByName(req.userName());
+      logger.info("Deleting user with username: {}", username);
+      int rowsAffected = dao.deleteByName(username);
       logger.info("Delete user operation affected {} rows", rowsAffected);
-      return rowsAffected;
+      return rowsAffected == 1;
     } catch (Exception e) {
-      logger.error("Error deleting user: {}", req.userName(), e);
+      logger.error("Error deleting user: {}", username, e);
       throw e;
     }
   }
