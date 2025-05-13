@@ -1,12 +1,14 @@
 package com.snackstack.server;
 
-import com.snackstack.server.config.ApplicationContext;
-import spark.Spark;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static spark.Spark.*;
+import com.snackstack.server.config.ApplicationContext;
+
+import spark.Spark;
+import static spark.Spark.before;
+import static spark.Spark.options;
+import static spark.Spark.port;
 
 public class Server {
 
@@ -57,6 +59,7 @@ public class Server {
       System.exit(1);
     }
 
+    // enable CORS
     enableCORS("*", "*", "*");
   }
 
