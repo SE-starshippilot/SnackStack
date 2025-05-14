@@ -76,18 +76,17 @@ function RecipesPage() {
         setShowSuccess(true);
 
         // Navigate to details page after a short delay
-        // setTimeout(() => {
-        //   navigate("/recipe-details", {
-        //     state: { recipe: selectedRecipe },
-        //   });
-        // }, 1500);
+        setTimeout(() => {
+          navigate("/recipe-details", {
+            state: { recipe: selectedRecipe },
+          });
+        }, 1500);
       }
     } catch (err) {
-      setIsSubmitting(false)
       console.error("Error confirming recipe:", err);
       setError("Failed to save recipe to history. Please try again.");
     } finally {
-      // setIsSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -104,7 +103,8 @@ function RecipesPage() {
               {recipe.recipeName}
             </Typography>
             <Typography color="text.secondary" gutterBottom>
-              {recipe.originName} · {recipe.servings} servings
+              {recipe.originName || "Unknown origin"} · {recipe.servings}{" "}
+              servings
             </Typography>
             <Typography variant="body1" sx={{ mt: 1, mb: 2 }}>
               {recipe.description}
@@ -115,6 +115,7 @@ function RecipesPage() {
                 <Typography fontWeight={500}>View Details</Typography>
               </AccordionSummary>
               <AccordionDetails>
+                {/* Ingredients */}
                 <Box mb={2}>
                   <Typography variant="subtitle1" fontWeight={600}>
                     Ingredients
@@ -124,8 +125,9 @@ function RecipesPage() {
                       (ing: Ingredient, i: number) => (
                         <ListItem key={i}>
                           <ListItemText
-                            primary={`${ing.ingredientName} — ${ing.quantity} ${ing.unit ?? ""
-                              }`}
+                            primary={`${ing.ingredientName} — ${ing.quantity} ${
+                              ing.unit ?? ""
+                            }`}
                             secondary={ing.note}
                           />
                         </ListItem>
@@ -136,15 +138,18 @@ function RecipesPage() {
 
                 <Divider sx={{ my: 2 }} />
 
+                {/* Steps */}
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600}>
                     Steps
                   </Typography>
                   <List dense>
-                    {recipe.recipeSteps.map((step: any, j: number) => (
+                    {recipe.recipeSteps.map((step: string, j: number) => (
                       <ListItem key={j}>
                         <ListItemText
-                          primaryTypographyProps={{ style: { whiteSpace: "pre-line" } }}
+                          primaryTypographyProps={{
+                            style: { whiteSpace: "pre-line" },
+                          }}
                           primary={`${j + 1}. ${step}`}
                         />
                       </ListItem>
@@ -191,7 +196,7 @@ function RecipesPage() {
             onClick={handleConfirmSelection}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Saved" : "Confirm"}
+            {isSubmitting ? "Saving..." : "Confirm"}
           </Button>
         )}
       </Box>
