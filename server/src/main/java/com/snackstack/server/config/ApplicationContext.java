@@ -19,7 +19,6 @@ public class ApplicationContext implements AutoCloseable {
   private static final Logger logger = LoggerFactory.getLogger(ApplicationContext.class);
 
   private final DBConfig dbConfig;
-  private OllamaConfig ollamaConfig;
   private final Gson gson;
   // DAOs
   private final UserDAO userDAO;
@@ -38,7 +37,7 @@ public class ApplicationContext implements AutoCloseable {
   private final RecipeService recipeService;
   private final List<Controller> controllers = new ArrayList<>();
 
-  public ApplicationContext(boolean mock) {
+  public ApplicationContext(LLMProvider provider) {
     logger.info("Initializing ApplicationContext");
 
     // Initialize configuration
@@ -53,12 +52,21 @@ public class ApplicationContext implements AutoCloseable {
         .create();
 
     // Initialize Recipe Generator
-    if (mock) {
-      logger.warn("Using Mock LLM!!!");
-      this.recipeGenerator = new MockRecipeGenerator(this.gson);
-    } else {
-      this.ollamaConfig = config.configOllama();
-      this.recipeGenerator = new OllamaRecipeGenerator(this.ollamaConfig, this.gson);
+    switch (provider){
+      case OLLAMA:
+        logger.info("Using OLLAMA service");
+        OllamaConfig ollamaConfig = config.configOllama();
+        this.recipeGenerator = new OllamaRecipeGenerator(ollamaConfig, this.gson);
+        break;
+      case OPENAI:
+        logger.info("Using OPENAI service");
+        OpenAIConfig openAIConfig = config.configOpenAi();
+        this.recipeGenerator = new OpenAIRecipeGenerator(openAIConfig, this.gson);
+        break;
+      default:
+        logger.warn("Fallback to mocked LLM service");
+        this.recipeGenerator = new MockRecipeGenerator(this.gson);
+        break;
     }
 
     // Initialize DAOs
