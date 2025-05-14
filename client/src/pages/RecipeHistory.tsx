@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RecipeTable } from "../components/RecipeTable";
 import "../styles/HistoryRecipes.css";
@@ -20,15 +20,23 @@ import { useUserContext } from "../contexts/UserContext";
 
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api";
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+// small generic hook
+function useDebounce<T>(value: T, delay = 400) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
+
+
 
 const buildQueryString = (params: Record<string, unknown>) =>
   Object.entries(params)
-    .filter(
-      ([, v]) =>
-        v !== undefined &&
-        v !== null
-    )
+    .filter(([, v]) => v !== undefined && v !== null)
     .map(
       ([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`
     )
@@ -46,6 +54,8 @@ const HistoryRecipes: React.FC = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
+  const debouncedSearch = useDebounce(searchTerm, 400);
+
   /* request state -------------------------------------------------- */
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +64,7 @@ const HistoryRecipes: React.FC = () => {
    * Fetch helper
    * ---------------------------------------------------------------- */
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     if (!dbUserId) return; // no DB user yet
     setIsLoading(true);
     setError(null);
@@ -65,7 +75,7 @@ const HistoryRecipes: React.FC = () => {
         limit: rowsPerPage,
         sortAsc: sortOrder === "oldest",
         favoriteOnly: showFavoritesOnly,
-        keyword: searchTerm,
+        keyword: debouncedSearch,
       });
 
       const { data } = await axios.get<
@@ -73,24 +83,27 @@ const HistoryRecipes: React.FC = () => {
           id: number;
           userId: number;
           recipeId: number;
+          recipeUuid: string;
           recipeName: string;
           recipeDescription: string;
           createdAt: string;
           isFavorite: boolean;
-          recipeStep: string[] | null;
+          recipeSteps: string[] | null;
           recipeIngredients: Ingredient[] | null;
         }[]
-      >(`${API_BASE_URL}/history/${dbUserId}?${qs}`);
+      >(`${apiBaseUrl}/api/history/${dbUserId}?${qs}`);
+
+      console.log("Fetched history:", data);
 
       const mapped: Recipe[] = data.map((d) => ({
         id: d.id,
-        uuid: String(d.recipeId),
+        uuid: String(d.recipeUuid),
         recipeName: d.recipeName,
         servings: 0, // backend doesn’t send this yet
         recipeDescription: d.recipeDescription ?? "",
         originName: "",
         recipeIngredients: d.recipeIngredients ?? [],
-        recipeSteps: d.recipeStep ?? [],
+        recipeSteps: d.recipeSteps ?? [],
         historyId: d.id,
         createdAt: d.createdAt,
         isFavorite: d.isFavorite,
@@ -106,36 +119,43 @@ const HistoryRecipes: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dbUserId, page, rowsPerPage, sortOrder, showFavoritesOnly, debouncedSearch]);
 
-  /* fetch on mount / filter changes / user change ------------------ */
   useEffect(() => {
     fetchHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchTerm, showFavoritesOnly, sortOrder, dbUserId]);
+  }, [fetchHistory]);
+  
 
   /* optimistic favourite toggle ------------------------------------ */
-  const handleToggleFavorite = async (row: Recipe) => {};
-  // const handleToggleFavorite = async (row) => {
-  //   setRecipes((prev) =>
-  //     prev.map((r) =>
-  //       r.id === row.historyId ? { ...r, isFavorite: !r.isFavorite } : r
-  //     )
-  //   );
+  const handleToggleFavorite = async (row: Recipe) => {
+    if (!dbUserId) return;
+    setRecipes((prev) =>
+      prev.map((r) =>
+        r.id === row.id ? { ...r, isFavorite: !r.isFavorite } : r
+      )
+    );
 
-  //   try {
-  //     await axios.patch(`/api/history/${row.historyId}/favorite`);
-  //   } catch {
-  //     /* roll back on failure */
-  //     setRecipes((prev) =>
-  //       prev.map((r) =>
-  //         r.id === row.historyId
-  //           ? { ...r, isFavorite: !r.isFavorite }
-  //           : r
-  //       )
-  //     );
-  //   }
-  // };
+    try {
+      /* 2. call the new PUT  /api/history/:recipeUuid/favorite  endpoint */
+      await axios.put(`${apiBaseUrl}/api/history/${row.uuid}/favorite`, {
+        userId: dbUserId,
+        favorite: !row.isFavorite, // <‑‑ the desired new state
+      });
+      await fetchHistory();
+    } catch (err) {
+      /* 3. roll back if request fails */
+      console.error(err);
+      if (axios.isAxiosError(err)) {
+        // err is now typed as AxiosError<unknown>
+        setError(
+          err.response?.data?.message ??
+            "Could not update favourite status. Please try again."
+        );
+      } else {
+        setError("Could not update favourite status. Please try again.");
+      }
+    }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) =>
     e.key === "Enter" && setPage(1) && fetchHistory();

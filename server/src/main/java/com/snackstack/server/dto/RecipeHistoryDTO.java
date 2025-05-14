@@ -9,6 +9,7 @@ public record RecipeHistoryDTO(
     @ColumnName("id") int id,
     @ColumnName("user_id") int userId,
     @ColumnName("recipe_id") int recipeId,
+    @ColumnName("uuid")        String recipeUuid,
     @ColumnName("recipeName") String recipeName,
     @ColumnName("recipeDescription") String recipeDescription,
     @ColumnName("createdAt") Instant createdAt,
@@ -21,11 +22,12 @@ public record RecipeHistoryDTO(
         @ColumnName("id") int id,
         @ColumnName("user_id") int userId,
         @ColumnName("recipe_id") int recipeId,
+        @ColumnName("uuid")        String recipeUuid,
         @ColumnName("recipeName") String recipeName,
         @ColumnName("recipeDescription") String recipeDescription,
         @ColumnName("createdAt") Instant createdAt,
         @ColumnName("isFavorite") boolean isFavorite
     ) {
-        this(id, userId, recipeId, recipeName, recipeDescription, createdAt, isFavorite, null, null);
+        this(id, userId, recipeId, recipeUuid, recipeName, recipeDescription, createdAt, isFavorite, null, null);
     }
 } 

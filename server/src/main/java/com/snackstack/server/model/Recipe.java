@@ -7,7 +7,6 @@ public record Recipe(
     Integer servings,
     String recipeOrigin,
     RecipeType recipeType,
-    Boolean isFavorite,
     String uuid
 ) {
 

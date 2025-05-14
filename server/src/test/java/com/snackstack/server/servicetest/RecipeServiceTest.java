@@ -3,16 +3,13 @@ package com.snackstack.server.servicetest;
 import static org.junit.Assert.assertEquals;
 
 import com.google.gson.Gson;
-import com.snackstack.server.dao.IngredientDAO;
-import com.snackstack.server.dao.InventoryDAO;
-import com.snackstack.server.dao.RecipeDAO;
-import com.snackstack.server.dao.RecipeIngredientDAO;
-import com.snackstack.server.dao.RecipeStepDAO;
-import com.snackstack.server.dto.RecipeRequestDTO;
+import com.snackstack.server.dao.*;
+import com.snackstack.server.dto.*;
 import com.snackstack.server.model.Recipe;
 import com.snackstack.server.model.RecipeIngredient;
 import com.snackstack.server.model.RecipeStep;
 import com.snackstack.server.model.RecipeType;
+import com.snackstack.server.service.InventoryService;
 import com.snackstack.server.service.RecipeService;
 import com.snackstack.server.service.llm.MockRecipeGenerator;
 import java.util.List;
@@ -36,14 +33,27 @@ public class RecipeServiceTest {
   private IngredientDAO ingredientDAO;
   private RecipeService recipeService;
   private InventoryDAO inventoryDAO;
-  private RecipeRequestDTO recipeRequest = new RecipeRequestDTO(1, RecipeType.MAIN, null, null);
-
+  private InventoryService inventoryService;
+  private UserDAO userDAO;
+  private UserService userService;
+  private final String sampleUserName = "Nim Telson";
+  private final String sampleUserEmail = "nim@snackstack.com";
+  private final UserDTO sampleUser = new UserDTO(sampleUserName, sampleUserEmail);
   @Before
   public void setUp() {
     Jdbi jdbi = jdbiRule.getJdbi();
 
     jdbi.useHandle(handle -> {
       handle.execute("""
+          CREATE TABLE users
+          (
+              user_id       SERIAL PRIMARY KEY,
+              user_name     VARCHAR(16) NOT NULL,
+              email         TEXT UNIQUE NOT NULL,
+              created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+              last_login_at TIMESTAMP
+          );
+
           CREATE TABLE ingredients (
               ingredient_id SERIAL PRIMARY KEY,
               ingredient_name VARCHAR(255) NOT NULL UNIQUE
@@ -55,16 +65,16 @@ public class RecipeServiceTest {
           """);
 
       handle.execute("""
-          CREATE TABLE recipes (
-            recipe_id SERIAL PRIMARY KEY,
-            recipe_name TEXT NOT NULL,
-            description TEXT,
-            servings INT,
-            recipe_origin_id VARCHAR(16),
-            recipe_type VARCHAR(20) CHECK (recipe_type IS NULL OR recipe_type IN ('Main', 'Appetizer', 'Dessert', 'Breakfast', 'Snack')),
-            is_favorite BOOLEAN DEFAULT FALSE,
-            uuid VARCHAR(36) NOT NULL UNIQUE
-            )
+          CREATE TYPE recipe_type AS ENUM ('MAIN', 'APPETIZER', 'DESSERT', 'BREAKFAST', 'SNACK');
+                CREATE TABLE recipes (
+                    recipe_id SERIAL PRIMARY KEY,
+                    recipe_name TEXT NOT NULL,
+                    description TEXT,
+                    servings INT,
+                    recipe_origin_id VARCHAR(16),
+                    recipe_type TEXT,
+                    uuid VARCHAR(36) NOT NULL UNIQUE
+                );
           """);
 
       handle.execute("""
@@ -88,7 +98,18 @@ public class RecipeServiceTest {
               PRIMARY KEY (recipe_id, ingredient_id),
               FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE,
               FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id) ON DELETE RESTRICT
-          )
+          );
+
+          CREATE TABLE inventory_items
+                (
+                    inventory_item_id SERIAL PRIMARY KEY,
+                    user_id           INT         NOT NULL
+                        REFERENCES users (user_id)
+                            ON DELETE CASCADE,
+                    ingredient_id     INT         NOT NULL
+                        REFERENCES ingredients (ingredient_id),
+                    purchase_date     TIMESTAMP NOT NULL DEFAULT now()
+                );
           """);
     });
     // Initialize DAOs
@@ -115,8 +136,28 @@ public class RecipeServiceTest {
     );
     ingredientDAO.batchAddIngredients(sampleIngredients);
 
+    userService.createUser(sampleUser);
+    // create recipes
+    List<IngredientDTO> recipeIngredients = new ArrayList<>();
+    IngredientDTO ingredientDTO = new IngredientDTO("ingredient1", 1, "unit", "note");
+    recipeIngredients.add(ingredientDTO);
+    List<String> recipeSteps = new ArrayList<>();
+    recipeSteps.add("step1");
+    RecipeResponseDTO recipeResponseDTO = new RecipeResponseDTO("recipe_name", 1, "description", "origin_name", recipeIngredients, recipeSteps);
+    List<String> availableIngredients = new ArrayList<>();
+    availableIngredients.add("ingredient1");
+    RecipeType recipeType = MAIN;
+    List<String> mealOrigin = new ArrayList<>();
+    mealOrigin.add("origin_name");
+    List<String> allergies = new ArrayList<>();
+    allergies.add("allergy");
+//    inventoryService.addInventoryRecord(sampleUserName, "ingredient1");
+    RecipeGenerationDTO recipeGenerationDTO = new RecipeGenerationDTO(availableIngredients, 1, recipeType, mealOrigin, allergies);
+    recipeService.saveRecipe(recipeResponseDTO, recipeGenerationDTO);
+
   }
 
+  // save another recipe into database
   @Test
   public void generateRecipesUsingMock_ShouldStoreToDatabase() {
 //    recipeService.generateRecipes(recipeRequest);

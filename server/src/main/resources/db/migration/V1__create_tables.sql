@@ -48,7 +48,6 @@ CREATE TABLE recipes
     servings         INT,
     recipe_origin_id VARCHAR(16),
     recipe_type      recipe_type,
-    is_favorite      BOOLEAN DEFAULT false,
     uuid             VARCHAR(36) NOT NULL UNIQUE
 );
 
@@ -57,7 +56,8 @@ CREATE TABLE recipe_history
     history_id  SERIAL PRIMARY KEY,
     user_id     INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     recipe_id   INT NOT NULL REFERENCES recipes(recipe_id) ON DELETE CASCADE,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    is_favorite      BOOLEAN DEFAULT false
 );
 
 CREATE TABLE recipe_steps

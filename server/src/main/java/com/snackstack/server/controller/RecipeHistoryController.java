@@ -46,6 +46,19 @@ public class RecipeHistoryController implements Controller {
                 return gson.toJson(history);
             });
 
+            /* ---- PUT /api/history/:recipeUuid/favorite ---- */
+            put("/:recipeUuid/favorite", (req, res) -> {
+                String recipeUuid = req.params(":recipeUuid");
+                FavoriteRequest body = gson.fromJson(req.body(), FavoriteRequest.class);
+
+                logger.info("Request to set favorite={} for recipe UUID {} (user {})",
+                    body.favorite(), recipeUuid, body.userId());
+
+                service.setFavoriteStatus(recipeUuid, body.userId(), body.favorite());
+                res.status(204);   // No Content
+                return "";
+            });
+
             post("", (req, res) -> {
                 var body = gson.fromJson(req.body(), HistoryRequest.class);
                 logger.info("Received request to add recipe uuid {} to history for user {}",
@@ -85,4 +98,5 @@ public class RecipeHistoryController implements Controller {
 
     private record HistoryRequest(int userId, String recipeUuid) {}
     private record IdResponse(int id) {}
+    private record FavoriteRequest(int userId, boolean favorite) {}
 } 
