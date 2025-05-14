@@ -26,17 +26,17 @@ INSERT INTO ingredients (ingredient_id, ingredient_name) VALUES
     (19, 'Butter'),
     (20, 'Flour');
 
-INSERT INTO recipes (recipe_id, recipe_name, description, servings, recipe_origin_id, recipe_type, is_favorite, uuid) VALUES
-    (1, 'Spaghetti Carbonara', 'Classic Italian pasta dish with eggs and pancetta', 2, 'Italian', 'main', true, '11111111-1111-1111-1111-111111111111'),
-    (2, 'Chicken Tikka Masala', 'Creamy and spicy Indian curry', 4, 'Indian', 'main', false, '22222222-2222-2222-2222-222222222222'),
-    (3, 'Classic Pancakes', 'Fluffy breakfast pancakes', 2, 'American', 'breakfast', true, '33333333-3333-3333-3333-333333333333'),
-    (4, 'Caesar Salad', 'Fresh and crispy classic salad', 2, 'American', 'appetizer', false, '44444444-4444-4444-4444-444444444444'),
-    (5, 'Beef Burger', 'Juicy homemade burger with all the fixings', 1, 'American', 'main', true, '55555555-5555-5555-5555-555555555555'),
-    (6, 'Chocolate Brownies', 'Rich and fudgy dessert squares', 8, 'American', 'dessert', true, '66666666-6666-6666-6666-666666666666'),
-    (7, 'Vegetable Stir-Fry', 'Quick and healthy Asian-style vegetables', 2, 'Chinese', 'main', false, '77777777-7777-7777-7777-777777777777'),
-    (8, 'Fish Tacos', 'Fresh and zesty Mexican-style tacos', 3, 'Mexican', 'main', true, '88888888-8888-8888-8888-888888888888'),
-    (9, 'Mushroom Risotto', 'Creamy Italian rice dish', 4, 'Italian', 'main', false, '99999999-9999-9999-9999-999999999999'),
-    (10, 'Apple Pie', 'Classic American dessert', 8, 'American', 'dessert', true, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
+INSERT INTO recipes (recipe_id, recipe_name, description, servings, recipe_origin_id, recipe_type, uuid) VALUES
+    (1, 'Spaghetti Carbonara', 'Classic Italian pasta dish with eggs and pancetta', 2, 'Italian', 'MAIN', '11111111-1111-1111-1111-111111111111'),
+    (2, 'Chicken Tikka Masala', 'Creamy and spicy Indian curry', 4, 'Indian', 'MAIN', '22222222-2222-2222-2222-222222222222'),
+    (3, 'Classic Pancakes', 'Fluffy breakfast pancakes', 2, 'American', 'BREAKFAST', '33333333-3333-3333-3333-333333333333'),
+    (4, 'Caesar Salad', 'Fresh and crispy classic salad', 2, 'American', 'APPETIZER', '44444444-4444-4444-4444-444444444444'),
+    (5, 'Beef Burger', 'Juicy homemade burger with all the fixings', 1, 'American', 'MAIN', '55555555-5555-5555-5555-555555555555'),
+    (6, 'Chocolate Brownies', 'Rich and fudgy dessert squares', 8, 'American', 'DESSERT', '66666666-6666-6666-6666-666666666666'),
+    (7, 'Vegetable Stir-Fry', 'Quick and healthy Asian-style vegetables', 2, 'Chinese', 'MAIN', '77777777-7777-7777-7777-777777777777'),
+    (8, 'Fish Tacos', 'Fresh and zesty Mexican-style tacos', 3, 'Mexican', 'MAIN', '88888888-8888-8888-8888-888888888888'),
+    (9, 'Mushroom Risotto', 'Creamy Italian rice dish', 4, 'Italian', 'MAIN', '99999999-9999-9999-9999-999999999999'),
+    (10, 'Apple Pie', 'Classic American dessert', 8, 'American', 'DESSERT', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
 
 INSERT INTO recipe_steps (recipe_id, step_number, step_description) VALUES
     (1, 1, 'Cook spaghetti in salted water'),
@@ -92,19 +92,19 @@ INSERT INTO inventory_items (user_id, ingredient_id, purchase_date) VALUES
     (4, 13, NOW()),
     (4, 15, NOW() - INTERVAL '3 days');
 
-INSERT INTO recipe_history (history_id, user_id, recipe_id, created_at) VALUES
-    (1, 1, 1, NOW() - INTERVAL '1 day'),
-    (2, 1, 2, NOW() - INTERVAL '2 days'),
-    (3, 1, 3, NOW() - INTERVAL '3 days'),
-    (4, 1, 4, NOW() - INTERVAL '4 days'),
-    (5, 1, 5, NOW() - INTERVAL '5 days'),
-    (6, 1, 6, NOW() - INTERVAL '6 days'),
-    (7, 2, 7, NOW() - INTERVAL '1 day'),
-    (8, 2, 8, NOW() - INTERVAL '2 days'),
-    (9, 3, 9, NOW() - INTERVAL '1 day'),
-    (10, 3, 10, NOW() - INTERVAL '2 days'),
-    (11, 4, 1, NOW() - INTERVAL '1 day'),
-    (12, 4, 2, NOW() - INTERVAL '2 days');
+INSERT INTO recipe_history (history_id, user_id, recipe_id, created_at, is_favorite) VALUES
+    (1, 1, 1, NOW() - INTERVAL '1 day', true),
+    (2, 1, 2, NOW() - INTERVAL '2 days', false),
+    (3, 1, 3, NOW() - INTERVAL '3 days', true),
+    (4, 1, 4, NOW() - INTERVAL '4 days', false),
+    (5, 1, 5, NOW() - INTERVAL '5 days', true),
+    (6, 1, 6, NOW() - INTERVAL '6 days', true),
+    (7, 2, 7, NOW() - INTERVAL '1 day', false),
+    (8, 2, 8, NOW() - INTERVAL '2 days', true),
+    (9, 3, 9, NOW() - INTERVAL '1 day', false),
+    (10, 3, 10, NOW() - INTERVAL '2 days', true),
+    (11, 4, 1, NOW() - INTERVAL '1 day', true),
+    (12, 4, 2, NOW() - INTERVAL '2 days', false);
 
 SELECT setval('users_user_id_seq', (SELECT MAX(user_id) FROM users));
 SELECT setval('recipes_recipe_id_seq', (SELECT MAX(recipe_id) FROM recipes));
