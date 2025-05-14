@@ -9,6 +9,10 @@ import {
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 
+const disableAuth  = import.meta.env.VITE_DISABLE_AUTH === "true";
+const testUsername = import.meta.env.VITE_TEST_USERNAME;
+const testEmail    = import.meta.env.VITE_TEST_EMAIL;
+
 interface UserContextType {
   dbUserId: number | null;
   username: string;
@@ -38,11 +42,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("userProfile");
   };
 
-  // Monitor Clerk authentication state
   useEffect(() => {
+    // 1) If disableAuth is true, immediately seed the test user and skip everything else
+    if (disableAuth && testUsername && testEmail) {
+      setDbUserId(-1);            // dummy id
+      setUsername(testUsername);
+      setEmail(testEmail);
+      setIsProfileComplete(true);
+      return;                     // STOP here—no Clerk or API calls
+    }
+  
+    // 2) Otherwise, run your existing Clerk + localStorage + backend‐check logic:
     if (isLoaded) {
       if (!isSignedIn) {
-        // User logged out, clear data
         clearUserData();
       } else if (user) {
         // Get user's email from Clerk
@@ -74,7 +86,45 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     }
-  }, [isLoaded, isSignedIn, user]);
+  }, [disableAuth, testUsername, testEmail, isLoaded, isSignedIn, user]);
+
+  // // Monitor Clerk authentication state
+  // useEffect(() => {
+  //   if (isLoaded) {
+  //     if (!isSignedIn) {
+  //       // User logged out, clear data
+  //       clearUserData();
+  //     } else if (user) {
+  //       // Get user's email from Clerk
+  //       const userEmail = user.primaryEmailAddress?.emailAddress || "";
+
+  //       // User is logged in, attempt to load profile from localStorage first
+  //       const savedUser = localStorage.getItem("userProfile");
+  //       if (savedUser) {
+  //         try {
+  //           const userData = JSON.parse(savedUser);
+  //           // Verify the saved email matches the current Clerk user's email
+  //           if (userData.email === userEmail) {
+  //             setDbUserId(userData.id);
+  //             setUsername(userData.username);
+  //             setEmail(userData.email);
+  //             setIsProfileComplete(true);
+  //           } else {
+  //             // Stored data is for a different user, clear it
+  //             clearUserData();
+  //           }
+  //         } catch (e) {
+  //           clearUserData();
+  //         }
+  //       }
+
+  //       // If no profile data is loaded, check the backend
+  //       if (!isProfileComplete && userEmail) {
+  //         checkUserProfileByEmail(userEmail);
+  //       }
+  //     }
+  //   }
+  // }, [isLoaded, isSignedIn, user]);
 
   // Check if user exists in backend by email
   const checkUserProfileByEmail = (email: string) => {

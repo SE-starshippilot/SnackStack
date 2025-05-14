@@ -27,16 +27,16 @@ INSERT INTO ingredients (ingredient_id, ingredient_name) VALUES
     (20, 'Flour');
 
 INSERT INTO recipes (recipe_id, recipe_name, description, servings, recipe_origin_id, recipe_type, is_favorite, uuid) VALUES
-    (1, 'Spaghetti Carbonara', 'Classic Italian pasta dish with eggs and pancetta', 2, 'Italian', 'main', true, '11111111-1111-1111-1111-111111111111'),
-    (2, 'Chicken Tikka Masala', 'Creamy and spicy Indian curry', 4, 'Indian', 'main', false, '22222222-2222-2222-2222-222222222222'),
-    (3, 'Classic Pancakes', 'Fluffy breakfast pancakes', 2, 'American', 'breakfast', true, '33333333-3333-3333-3333-333333333333'),
-    (4, 'Caesar Salad', 'Fresh and crispy classic salad', 2, 'American', 'appetizer', false, '44444444-4444-4444-4444-444444444444'),
-    (5, 'Beef Burger', 'Juicy homemade burger with all the fixings', 1, 'American', 'main', true, '55555555-5555-5555-5555-555555555555'),
-    (6, 'Chocolate Brownies', 'Rich and fudgy dessert squares', 8, 'American', 'dessert', true, '66666666-6666-6666-6666-666666666666'),
-    (7, 'Vegetable Stir-Fry', 'Quick and healthy Asian-style vegetables', 2, 'Chinese', 'main', false, '77777777-7777-7777-7777-777777777777'),
-    (8, 'Fish Tacos', 'Fresh and zesty Mexican-style tacos', 3, 'Mexican', 'main', true, '88888888-8888-8888-8888-888888888888'),
-    (9, 'Mushroom Risotto', 'Creamy Italian rice dish', 4, 'Italian', 'main', false, '99999999-9999-9999-9999-999999999999'),
-    (10, 'Apple Pie', 'Classic American dessert', 8, 'American', 'dessert', true, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
+    (1, 'Spaghetti Carbonara', 'Classic Italian pasta dish with eggs and pancetta', 2, 'Italian', 'MAIN', true, '11111111-1111-1111-1111-111111111111'),
+    (2, 'Chicken Tikka Masala', 'Creamy and spicy Indian curry', 4, 'Indian', 'MAIN', false, '22222222-2222-2222-2222-222222222222'),
+    (3, 'Classic Pancakes', 'Fluffy breakfast pancakes', 2, 'American', 'BREAKFAST', true, '33333333-3333-3333-3333-333333333333'),
+    (4, 'Caesar Salad', 'Fresh and crispy classic salad', 2, 'American', 'APPETIZER', false, '44444444-4444-4444-4444-444444444444'),
+    (5, 'Beef Burger', 'Juicy homemade burger with all the fixings', 1, 'American', 'MAIN', true, '55555555-5555-5555-5555-555555555555'),
+    (6, 'Chocolate Brownies', 'Rich and fudgy dessert squares', 8, 'American', 'DESSERT', true, '66666666-6666-6666-6666-666666666666'),
+    (7, 'Vegetable Stir-Fry', 'Quick and healthy Asian-style vegetables', 2, 'Chinese', 'MAIN', false, '77777777-7777-7777-7777-777777777777'),
+    (8, 'Fish Tacos', 'Fresh and zesty Mexican-style tacos', 3, 'Mexican', 'MAIN', true, '88888888-8888-8888-8888-888888888888'),
+    (9, 'Mushroom Risotto', 'Creamy Italian rice dish', 4, 'Italian', 'MAIN', false, '99999999-9999-9999-9999-999999999999'),
+    (10, 'Apple Pie', 'Classic American dessert', 8, 'American', 'DESSERT', true, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
 
 INSERT INTO recipe_steps (recipe_id, step_number, step_description) VALUES
     (1, 1, 'Cook spaghetti in salted water'),
