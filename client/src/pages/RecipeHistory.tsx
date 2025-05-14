@@ -77,10 +77,12 @@ const HistoryRecipes: React.FC = () => {
           recipeDescription: string;
           createdAt: string;
           isFavorite: boolean;
-          recipeStep: string[] | null;
+          recipeSteps: string[] | null;
           recipeIngredients: Ingredient[] | null;
         }[]
       >(`${API_BASE_URL}/history/${dbUserId}?${qs}`);
+
+      console.log("Fetched history:", data);
 
       const mapped: Recipe[] = data.map((d) => ({
         id: d.id,
@@ -90,7 +92,7 @@ const HistoryRecipes: React.FC = () => {
         recipeDescription: d.recipeDescription ?? "",
         originName: "",
         recipeIngredients: d.recipeIngredients ?? [],
-        recipeSteps: d.recipeStep ?? [],
+        recipeSteps: d.recipeSteps ?? [],
         historyId: d.id,
         createdAt: d.createdAt,
         isFavorite: d.isFavorite,
