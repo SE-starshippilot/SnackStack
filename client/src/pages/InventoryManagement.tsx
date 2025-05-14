@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import "../styles/InventoryManagement.css";
 
-const API_BASE_URL = "http://localhost:8080/api";
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 function InventoryManagement() {
   const [inputValue, setInputValue] = useState("");
@@ -28,7 +28,7 @@ function InventoryManagement() {
 
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/users/${username}/inventory`
+        `${apiBaseUrl}/api/users/${username}/inventory`
       );
 
       const ingredientList: string[] = response.data;
@@ -67,7 +67,7 @@ function InventoryManagement() {
       )
     ) {
       try {
-        await axios.post(`${API_BASE_URL}/users/${username}/inventory`, {
+        await axios.post(`${apiBaseUrl}/api/users/${username}/inventory`, {
           ingredientName: inputValue,
         });
 
@@ -114,7 +114,7 @@ function InventoryManagement() {
       // Create an array of delete requests
       const deleteRequests = clickedItems.map((item) =>
         axios.delete(
-          `${API_BASE_URL}/users/${username}/inventory/${encodeURIComponent(
+          `${apiBaseUrl}/api/users/${username}/inventory/${encodeURIComponent(
             item
           )}`
         )

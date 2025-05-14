@@ -22,7 +22,7 @@ import axios from "axios";
 import { useUserContext } from "../contexts/UserContext"; // Import the UserContext hook
 import type { Ingredient, Recipe, LocationState } from "../types/recipe";
 
-const API_URL = "http://localhost:8080/api/history";
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 function RecipesPage() {
   const { state } = useLocation() as { state?: LocationState };
@@ -64,7 +64,7 @@ function RecipesPage() {
       setError(null);
 
       // Send request to add recipe to history using the user ID from context
-      await axios.post(API_URL, {
+      await axios.post(`${apiBaseUrl}/api/history`, {
         userId: dbUserId,
         recipeUuid: selectedRecipeId,
       });
@@ -107,7 +107,7 @@ function RecipesPage() {
               servings
             </Typography>
             <Typography variant="body1" sx={{ mt: 1, mb: 2 }}>
-              {recipe.description}
+              {recipe.recipeDescription}
             </Typography>
 
             <Accordion>

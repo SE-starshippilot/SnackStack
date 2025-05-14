@@ -20,7 +20,7 @@ import { useUserContext } from "../contexts/UserContext";
 
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api";
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 // small generic hook
 function useDebounce<T>(value: T, delay = 400) {
@@ -91,7 +91,7 @@ const HistoryRecipes: React.FC = () => {
           recipeSteps: string[] | null;
           recipeIngredients: Ingredient[] | null;
         }[]
-      >(`${API_BASE_URL}/history/${dbUserId}?${qs}`);
+      >(`${apiBaseUrl}/api/history/${dbUserId}?${qs}`);
 
       console.log("Fetched history:", data);
 
@@ -137,7 +137,7 @@ const HistoryRecipes: React.FC = () => {
 
     try {
       /* 2. call the new PUT  /api/history/:recipeUuid/favorite  endpoint */
-      await axios.put(`${API_BASE_URL}/history/${row.uuid}/favorite`, {
+      await axios.put(`${apiBaseUrl}/api/history/${row.uuid}/favorite`, {
         userId: dbUserId,
         favorite: !row.isFavorite, // <‑‑ the desired new state
       });
