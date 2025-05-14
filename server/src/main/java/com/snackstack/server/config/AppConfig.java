@@ -45,10 +45,42 @@ public class AppConfig {
     }
   }
 
+  public OpenAIConfig configOpenAi() throws RuntimeException {
+    try {
+      // Required parameters
+      String openaiApiKey = getField("OPENAI_API_KEY");
+      String systemPromptPath = getField("LLM_SYSTEM_PROMPT_FILE");
+      String openaiModel = getField("OPENAI_MODEL");
+
+      // Optional parameters with defaults
+      String openaiBaseUrl = getOptionalField("OPENAI_BASE_URL", "https://api.openai.com/v1");
+
+      return new OpenAIConfig(
+          openaiApiKey,
+          openaiBaseUrl,
+          openaiModel,
+          systemPromptPath
+      );
+    } catch (Exception e) {
+      logger.error("Failed to config OpenAIRecipeGenerator", e);
+      throw new RuntimeException("Failed to initialize OpenAIRecipeGenerator: " + e);
+    }
+  }
+
+
   private String getField(String fieldName) throws RuntimeException {
     String fieldVal = this.dotenv.get(fieldName);
     if (fieldVal == null) {
       throw new RuntimeException("Field " + fieldName + " not found");
+    }
+    return fieldVal;
+  }
+
+  private String getOptionalField(String fieldName, String defaultValue) {
+    String fieldVal = this.dotenv.get(fieldName);
+    if (fieldVal == null) {
+      logger.info("{} not provided, using default value", fieldName);
+      return defaultValue;
     }
     return fieldVal;
   }

@@ -1,5 +1,6 @@
 package com.snackstack.server;
 
+import com.snackstack.server.service.llm.LLMProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,15 +16,45 @@ public class Server {
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
   private static ApplicationContext appContext;
 
+  /**
+   * Parse command line arguments to determine the LLM provider.
+   * Format: --provider=OPENAI or -p=OPENAI
+   * @param args Command line arguments
+   * @return The selected LLM provider, defaults to MOCK if not specified or invalid
+   */
+  private static LLMProvider parseLLMProvider(String[] args) {
+    if (args != null) {
+      for (String arg : args) {
+        if (arg.startsWith("--provider=") || arg.startsWith("-p=")) {
+          String providerStr = arg.contains("--provider=") ?
+              arg.substring("--provider=".length()) :
+              arg.substring("-p=".length());
+
+          try {
+            return LLMProvider.valueOf(providerStr.toUpperCase());
+          } catch (IllegalArgumentException e) {
+            logger.warn("Invalid LLM provider: {}. Using default MOCK provider.", providerStr);
+          }
+        }
+      }
+    }
+
+    // Default to MOCK if no valid provider is specified
+    return LLMProvider.MOCK;
+  }
+
   public static void main(String[] args) {
     logger.info("Starting Snackstack server application");
+
+    LLMProvider provider = parseLLMProvider(args);
+    logger.info("Using LLM provider: {}", provider);
 
     try {
       logger.debug("Setting server port to 8080");
       port(8080);
 
       logger.info("Initializing application context");
-      appContext = new ApplicationContext(true);
+      appContext = new ApplicationContext(provider);
 
       logger.info("Registering Controller routes");
       appContext.registerAllRoutes();

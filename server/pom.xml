@@ -126,6 +126,13 @@
       <version>9.22.3</version>
     </dependency>
 
+    <!--Open AI API Service-->
+    <dependency>
+      <groupId>com.openai</groupId>
+      <artifactId>openai-java</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
   </dependencies>
 
   <build>
