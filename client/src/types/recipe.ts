@@ -6,13 +6,16 @@ export interface Ingredient {
 }
 
 export interface Recipe {
+  id: number;
   uuid: string;
   recipeName: string;
   servings: number;
-  description: string;
+  recipeDescription: string;
   originName: string;
   recipeIngredients: Ingredient[];
   recipeSteps: string[];
+  isFavorite: boolean;
+  createdAt: string;
 }
 
 export interface LocationState {
