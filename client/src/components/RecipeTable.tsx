@@ -96,10 +96,9 @@ export const RecipeTable: React.FC<RecipeTableProps> = ({
           </TableHead>
           <TableBody>
             {recipes
-              .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-              .map((row, index) => (
+              .map((row) => (
                 <RecipeTableRow
-                  key={index}
+                  key={row.id}
                   row={row}
                   onToggleFavorite={onToggleFavorite}
                 />

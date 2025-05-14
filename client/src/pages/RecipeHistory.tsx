@@ -27,8 +27,7 @@ const buildQueryString = (params: Record<string, unknown>) =>
     .filter(
       ([, v]) =>
         v !== undefined &&
-        v !== null &&
-        !(typeof v === "boolean" && v === false)
+        v !== null
     )
     .map(
       ([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`
