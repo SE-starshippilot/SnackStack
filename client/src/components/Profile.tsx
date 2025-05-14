@@ -15,7 +15,7 @@ import axios from "axios";
 import { useUserContext } from "../contexts/UserContext";
 
 // Define the API base URL - adjust to match your backend
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function Profile() {
   const { user, isLoaded } = useUser();

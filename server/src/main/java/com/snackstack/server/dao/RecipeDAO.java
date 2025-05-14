@@ -84,7 +84,7 @@ public interface RecipeDAO {
 
 
   @SqlQuery("""
-      SELECT recipe_id                     AS id,
+      SELECT recipe_id                     AS recipeId,
              recipe_name                   AS recipeName,
              description,
              servings,

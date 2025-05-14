@@ -20,7 +20,7 @@ import { useUserContext } from "../contexts/UserContext";
 
 import axios from "axios";
 
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 // small generic hook
 function useDebounce<T>(value: T, delay = 400) {

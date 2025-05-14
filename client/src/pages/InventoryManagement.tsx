@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import "../styles/InventoryManagement.css";
 
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 function InventoryManagement() {
   const [inputValue, setInputValue] = useState("");

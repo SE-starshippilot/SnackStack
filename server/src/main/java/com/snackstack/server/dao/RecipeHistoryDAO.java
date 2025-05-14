@@ -24,7 +24,7 @@ public interface RecipeHistoryDAO {
   int deleteHistoryById(@Bind("historyId") int historyId, @Bind("userId") int userId);
 
   @SqlQuery("""
-          SELECT h.history_id as id, h.user_id, h.recipe_id, 
+          SELECT h.history_id as id, h.user_id, h.recipe_id, r.uuid,
                  r.recipe_name as recipeName, r.description as recipeDescription, 
                  h.created_at as createdAt, h.is_favorite as isFavorite
           FROM recipe_history h
