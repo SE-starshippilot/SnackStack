@@ -20,7 +20,8 @@ async function cleanupTestUser() {
   await db.end();
 }
 
-test.describe("Clerk Sign-In", () => {
+test.describe("Clerk Sign-In",
+   () => {
   test.beforeEach(async ({ page, context }) => {
     await context.clearCookies();
     await page.addInitScript(() => localStorage.clear());
@@ -65,6 +66,8 @@ test.describe("Clerk Sign-In", () => {
 
     await page.getByRole("button", { name: /save & continue/i }).click();
 
+    await page.waitForTimeout(1000);
+
     // back on your app, signed in
     await expect(
       page.getByRole("button", { name: /^sign out$/i })
@@ -74,6 +77,7 @@ test.describe("Clerk Sign-In", () => {
   await page.waitForURL("**/");
 
     // --- now use the `request` fixture to GET the newly created user ---
+    console.log(`${API_URL}/email/${encodeURIComponent(USER)}`);
     const apiRes = await request.get(`${API_URL}/email/${encodeURIComponent(USER)}`);
     expect(apiRes.status()).toBe(200);
 
