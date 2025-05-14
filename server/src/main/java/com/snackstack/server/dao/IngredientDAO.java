@@ -5,6 +5,7 @@ import java.util.List;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -24,11 +25,13 @@ public interface IngredientDAO {
    * @param ingredientName The name of the ingredient to add
    * @return The ID of the newly created ingredient
    */
-  @SqlQuery("""
+  @SqlUpdate("""
       INSERT INTO ingredients(ingredient_name)
       VALUES (:name)
-      RETURNING ingredient_id
+      
       """)
+//  RETURNING ingredient_id
+  @GetGeneratedKeys
   Integer addIngredient(@Bind("name") String ingredientName);
 
   /**

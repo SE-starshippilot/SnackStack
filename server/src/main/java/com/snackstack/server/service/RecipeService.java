@@ -132,7 +132,7 @@ public class RecipeService {
    * @param recipeRequest  The original request
    * @return The ID of the saved recipe
    */
-  private void saveRecipe(RecipeResponseDTO recipeResponse, RecipeGenerationDTO recipeRequest) {
+  public void saveRecipe(RecipeResponseDTO recipeResponse, RecipeGenerationDTO recipeRequest) {
     // 1. Save recipe
     int recipeId = recipeDAO.addRecipe(
         recipeResponse.recipeName(),

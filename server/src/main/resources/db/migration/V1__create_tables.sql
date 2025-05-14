@@ -47,7 +47,7 @@ CREATE TABLE recipes
     description      TEXT,
     servings         INT,
     recipe_origin_id VARCHAR(16),
-    recipe_type      recipe_type,
+    recipe_type      TEXT,
     is_favorite      BOOLEAN DEFAULT false,
     uuid             VARCHAR(36) NOT NULL UNIQUE
 );
