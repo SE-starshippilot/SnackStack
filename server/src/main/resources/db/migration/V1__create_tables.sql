@@ -10,6 +10,8 @@ DROP TABLE IF EXISTS request_preferences CASCADE;
 DROP TABLE IF EXISTS request_allergies CASCADE;
 DROP TYPE IF EXISTS recipe_type;
 
+CREATE EXTENSION pg_trgm;
+
 CREATE TABLE users
 (
     user_id       SERIAL PRIMARY KEY,

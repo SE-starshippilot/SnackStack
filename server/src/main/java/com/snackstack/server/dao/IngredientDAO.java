@@ -152,10 +152,44 @@ public interface IngredientDAO {
    * @return true if the ingredient exists, false otherwise
    */
   @SqlQuery("""
-      SELECT EXISTS(
-        SELECT 1 FROM ingredients
-        WHERE ingredient_name = :name
-      )
-      """)
+    SELECT EXISTS(
+      SELECT 1 FROM ingredients
+      WHERE ingredient_name = :name
+    )
+    """)
   boolean ingredientExists(@Bind("name") String ingredientName);
+
+
+  /**
+   * Checks if an ingredient with the given name exists in the database using fuzzy matching.
+   *
+   * @param ingredientName The name of the ingredient to check
+   * @param threshold The similarity threshold (0.0 to 1.0, where 1.0 is exact match)
+   * @return true if a similar ingredient exists, false otherwise
+   */
+  @SqlQuery("""
+    SELECT EXISTS(
+      SELECT 1 FROM ingredients
+      WHERE similarity(ingredient_name, :name) > :threshold
+    )
+    """)
+  boolean ingredientExistsFuzzy(@Bind("name") String ingredientName, @Bind("threshold") double threshold);
+
+  /**
+   * Finds the closest matching ingredient in the database.
+   *
+   * @param ingredientName The name of the ingredient to find
+   * @param threshold The similarity threshold (0.0 to 1.0)
+   * @return The name of the closest matching ingredient, or null if no match above threshold
+   */
+  @SqlQuery("""
+    SELECT ingredient_name 
+    FROM ingredients
+    WHERE similarity(ingredient_name, :name) > :threshold
+    ORDER BY similarity(ingredient_name, :name) DESC
+    LIMIT 1
+    """)
+  String findClosestIngredient(@Bind("name") String ingredientName, @Bind("threshold") double threshold);
+
+
 }
