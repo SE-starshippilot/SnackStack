@@ -25,11 +25,11 @@ public interface InventoryDAO {
    * @param purchaseDate The timestamp when the item was purchased
    * @return The ID of the newly created inventory item
    */
-  @SqlQuery("""
+  @SqlUpdate("""
       INSERT INTO inventory_items(user_id, ingredient_id, purchase_date)
       VALUES (:userId, :ingredientId, :purchaseDate)
-      RETURNING inventory_item_id
       """)
+  @GetGeneratedKeys
   Integer addInventoryItem(
       @Bind("userId") Integer userId,
       @Bind("ingredientId") Integer ingredientId,

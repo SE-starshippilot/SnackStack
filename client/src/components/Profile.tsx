@@ -15,7 +15,7 @@ import axios from "axios";
 import { useUserContext } from "../contexts/UserContext";
 
 // Define the API base URL - adjust to match your backend
-const API_URL = "http://localhost:8080/api/users";
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function Profile() {
   const { user, isLoaded } = useUser();
@@ -42,7 +42,7 @@ export default function Profile() {
           try {
             setIsCheckingProfile(true);
             // Check if user exists in backend by email
-            const response = await axios.get(`${API_URL}/email/${userEmail}`);
+            const response = await axios.get(`${apiBaseUrl}/api/users/email/${userEmail}`);
             
             if (response.data && response.data.userId) {
               console.log("Found existing user profile:", response.data);
@@ -146,7 +146,7 @@ export default function Profile() {
       console.log("Creating user profile with:", { userName: username, email });
       
       // Create user in your backend using axios
-      const response = await axios.post(API_URL, {
+      const response = await axios.post(`${apiBaseUrl}/api/users`, {
         userName: username,
         email: email,
       });

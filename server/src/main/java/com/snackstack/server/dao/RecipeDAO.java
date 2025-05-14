@@ -54,7 +54,6 @@ public interface RecipeDAO {
              servings,
              recipe_origin_id              AS recipeOrigin,
              recipe_type::text             AS recipeType,
-             is_favorite                   AS isFavorite,
              uuid
         FROM recipes
        WHERE recipe_id = :id
@@ -69,7 +68,6 @@ public interface RecipeDAO {
              servings,
              recipe_origin_id              AS recipeOrigin,
              recipe_type::text             AS recipeType,
-             is_favorite                   AS isFavorite,
              uuid
         FROM recipes
        WHERE uuid = :uuid
@@ -92,7 +90,6 @@ public interface RecipeDAO {
              servings,
              recipe_origin_id              AS recipeOrigin,
              recipe_type::text             AS recipeType,
-             is_favorite                   AS isFavorite,
              uuid
         FROM recipes
       """)
@@ -106,7 +103,6 @@ public interface RecipeDAO {
              servings,
              recipe_origin_id              AS recipeOrigin,
              recipe_type::text             AS recipeType,
-             is_favorite                   AS isFavorite,
              uuid
         FROM recipes
        WHERE recipe_id IN (<ids>)
@@ -121,27 +117,18 @@ public interface RecipeDAO {
              servings,
              recipe_origin_id              AS recipeOrigin,
              recipe_type::text             AS recipeType,
-             is_favorite                   AS isFavorite,
              uuid
         FROM recipes
        WHERE recipe_type = :type
       """)
   List<Recipe> getRecipesByType(@Bind("type") RecipeType recipeType);
 
-
   @SqlQuery("""
-      SELECT recipe_id                     AS id,
-             recipe_name                   AS recipeName,
-             description,
-             servings,
-             recipe_origin_id              AS recipeOrigin,
-             recipe_type::text             AS recipeType,
-             is_favorite                   AS isFavorite,
-             uuid
-        FROM recipes
-       WHERE is_favorite = true
+      SELECT uuid
+      FROM recipes
+      WHERE recipe_id = :recipeId
       """)
-  List<Recipe> getFavoriteRecipes();
+  String getRecipeUuidById(@Bind("recipeId") Integer recipeId);
 
 
   /**
@@ -160,7 +147,6 @@ public interface RecipeDAO {
              r.servings,
              r.recipe_origin_id            AS recipeOrigin,
              r.recipe_type::text           AS recipeType,
-             r.is_favorite                 AS isFavorite,
              r.uuid
         FROM recipes r
         JOIN recipe_ingredients ri USING (recipe_id)
@@ -200,7 +186,6 @@ public interface RecipeDAO {
              servings         = :servings,
              recipe_origin_id = :originId,
              recipe_type      = :type,
-             is_favorite      = :favorite,
              uuid             = :uuid
        WHERE recipe_id        = :id
       """)
@@ -213,14 +198,6 @@ public interface RecipeDAO {
       @Bind("favorite")   boolean     isFavorite,
       @Bind("uuid")       String      uuid);
 
-
-  @SqlUpdate("""
-      UPDATE recipes
-         SET is_favorite = :favorite
-       WHERE recipe_id   = :id
-      """)
-  int updateFavoriteStatus(@Bind("id") Integer recipeId,
-      @Bind("favorite") boolean isFavorite);
 
 
   /* ---------- DELETE ---------- */
@@ -262,7 +239,6 @@ public interface RecipeDAO {
              servings,
              recipe_origin_id              AS recipeOrigin,
              recipe_type::text             AS recipeType,
-             is_favorite                   AS isFavorite,
              uuid
         FROM recipes
        WHERE (recipe_name ILIKE '%' || :term || '%'
