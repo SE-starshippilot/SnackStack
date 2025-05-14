@@ -54,6 +54,7 @@ public class ApplicationContext implements AutoCloseable {
 
     // Initialize Recipe Generator
     if (mock) {
+      logger.warn("Using Mock LLM!!!");
       this.recipeGenerator = new MockRecipeGenerator(this.gson);
     } else {
       this.ollamaConfig = config.configOllama();

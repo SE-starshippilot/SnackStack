@@ -13,8 +13,12 @@ import com.snackstack.server.dao.RecipeDAO;
 import com.snackstack.server.exceptions.InvalidIngredientException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RecipeService {
 
@@ -24,6 +28,8 @@ public class RecipeService {
   private final RecipeIngredientDAO recipeIngredientDAO;
   private final IngredientDAO ingredientDAO;
   private final InventoryDAO inventoryDAO;
+
+  public static final Logger logger = LoggerFactory.getLogger(RecipeService.class);
 
   public RecipeService(RecipeGenerator recipeGenerator, RecipeDAO recipeDAO,
       RecipeStepDAO recipeStepDAO, RecipeIngredientDAO recipeIngredientDAO,
@@ -87,12 +93,22 @@ public class RecipeService {
    */
   private void validateAllRecipeIngredients(List<RecipeResponseDTO> recipes) {
     List<String> invalidIngredients = new ArrayList<>();
+    Map<String, String> correctedIngredients = new HashMap<>();
 
     for (RecipeResponseDTO recipe : recipes) {
       for (IngredientDTO ingredientDTO : recipe.recipeIngredients()) {
         String ingredientName = ingredientDTO.ingredientName();
+
+        // Try exact match first
         if (!ingredientDAO.ingredientExists(ingredientName)) {
-          invalidIngredients.add(ingredientName);
+          // If no exact match, try fuzzy matching
+          String closestMatch = ingredientDAO.findClosestIngredient(ingredientName, 0.6);
+
+          if (closestMatch == null) {
+            invalidIngredients.add(ingredientName);
+          } else {
+            correctedIngredients.put(ingredientName, closestMatch);
+          }
         }
       }
     }
@@ -100,6 +116,11 @@ public class RecipeService {
     if (!invalidIngredients.isEmpty()) {
       throw new InvalidIngredientException("Recipe contains invalid ingredients: " +
           String.join(", ", invalidIngredients));
+    }
+
+    if (!correctedIngredients.isEmpty()) {
+      // Log or notify about the corrections
+      logger.info("Corrected ingredients: " + correctedIngredients);
     }
   }
 
@@ -128,19 +149,46 @@ public class RecipeService {
         .toList();
     recipeStepDAO.addStepsForRecipe(recipeId, stepNumbers, recipeResponse.recipeSteps());
 
-    // 3. Save recipe ingredients
+    // 3. Save recipe ingredients with fuzzy matching
+    Map<String, String> correctedIngredients = new HashMap<>();
+    double similarityThreshold = 0.6; // Adjust as needed
+
     for (IngredientDTO ingredient : recipeResponse.recipeIngredients()) {
-      // Get ingredient ID - we know it exists because we validated earlier
-      Integer ingredientId = ingredientDAO.getIngredientIdByName(ingredient.ingredientName());
+      String ingredientName = ingredient.ingredientName();
+      Integer ingredientId = null;
+
+      // Try exact match first for efficiency
+      if (ingredientDAO.ingredientExists(ingredientName)) {
+        ingredientId = ingredientDAO.getIngredientIdByName(ingredientName);
+      } else {
+        // If no exact match, find closest match
+        String closestMatch = ingredientDAO.findClosestIngredient(ingredientName, similarityThreshold);
+
+        if (closestMatch != null) {
+          ingredientId = ingredientDAO.getIngredientIdByName(closestMatch);
+          correctedIngredients.put(ingredientName, closestMatch);
+        } else {
+          // Skip this ingredient
+           continue;
+        }
+      }
 
       // Add to recipe_ingredients table
-      recipeIngredientDAO.addIngredientToRecipe(
-          recipeId,
-          ingredientId,
-          ingredient.quantity(),
-          ingredient.unit(),
-          ingredient.note()
-      );
+      if (ingredientId != null) {
+        recipeIngredientDAO.addIngredientToRecipe(
+            recipeId,
+            ingredientId,
+            ingredient.quantity(),
+            ingredient.unit(),
+            ingredient.note()
+        );
+      }
+    }
+
+    // Log corrections if any were made
+    if (!correctedIngredients.isEmpty()) {
+      Logger logger = LoggerFactory.getLogger(RecipeService.class);
+      logger.info("Ingredient corrections for recipe {}: {}", recipeResponse.uuid(), correctedIngredients);
     }
   }
 
