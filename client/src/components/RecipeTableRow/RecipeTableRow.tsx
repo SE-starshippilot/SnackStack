@@ -43,11 +43,11 @@ const RecipeTableRowComponent: React.FC<RecipeTableRowProps> = ({
             <IcecreamOutlinedIcon />
           </IconButton>
         </StyledTableCell>
-        <StyledTableCell>{row.recipe_name}</StyledTableCell>
-        <StyledTableCell>{row.date}</StyledTableCell>
-        <StyledTableCell>{row.description}</StyledTableCell>
+        <StyledTableCell>{row.recipeName}</StyledTableCell>
+        <StyledTableCell>{row.createdAt}</StyledTableCell>
+        <StyledTableCell>{row.recipeDescription}</StyledTableCell>
         <StyledTableCell>
-          {row.recipe_ingredients.map((i) => i.ingredient_name).join(", ")}
+          {row.recipeIngredients.map((i) => i.ingredientName).join(", ")}
         </StyledTableCell>
         <StyledTableCell>
           <FavoriteButton recipe={row} onToggleFavorite={onToggleFavorite} />

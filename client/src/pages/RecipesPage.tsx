@@ -12,31 +12,32 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  JSXElementConstructor,
-  Key,
-  ReactElement,
-  ReactNode,
-  ReactPortal,
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useUserContext } from "../contexts/UserContext"; // Import the UserContext hook
 import type { Ingredient, Recipe, LocationState } from "../types/recipe";
+
+const API_URL = "http://localhost:8080/api/history";
 
 function RecipesPage() {
   const { state } = useLocation() as { state?: LocationState };
   const navigate = useNavigate();
+  const { dbUserId } = useUserContext(); // Get user ID from context
   const [recipes, setRecipes] = useState<Recipe[]>(state?.recipes ?? []);
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  /* If the page is refreshed there is no state – redirect user back */
   useEffect(() => {
     if (state?.recipes?.length) {
       setRecipes(state.recipes);
     } else {
-      // No recipes (e.g. page refresh or bad state) → send user back
       navigate("/cook", { replace: true });
     }
   }, [state, navigate]);
@@ -45,13 +46,57 @@ function RecipesPage() {
     navigate("/cook");
   };
 
+  const handleSelectRecipe = (uuid: string) => {
+    setSelectedRecipeId(uuid);
+  };
+
+  const handleConfirmSelection = async () => {
+    if (!selectedRecipeId) return;
+
+    // Check if user is logged in
+    if (!dbUserId) {
+      setError("Please log in to save recipes to your history");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setError(null);
+
+      // Send request to add recipe to history using the user ID from context
+      await axios.post(API_URL, {
+        userId: dbUserId,
+        recipeUuid: selectedRecipeId,
+      });
+
+      // Filter to keep only the selected recipe
+      const selectedRecipe = recipes.find((r) => r.uuid === selectedRecipeId);
+      if (selectedRecipe) {
+        setRecipes([selectedRecipe]);
+        setShowSuccess(true);
+
+        // Navigate to details page after a short delay
+        setTimeout(() => {
+          navigate("/recipe-details", {
+            state: { recipe: selectedRecipe },
+          });
+        }, 1500);
+      }
+    } catch (err) {
+      console.error("Error confirming recipe:", err);
+      setError("Failed to save recipe to history. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom fontWeight={600} textAlign="center">
         Your Generated Recipes
       </Typography>
 
-      {recipes.map((recipe, index) => (
+      {recipes.map((recipe) => (
         <Card key={recipe.uuid} sx={{ mb: 4, boxShadow: 3 }}>
           <CardContent>
             <Typography variant="h5" fontWeight={600}>
@@ -114,18 +159,68 @@ function RecipesPage() {
               </AccordionDetails>
             </Accordion>
           </CardContent>
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+            <Button
+              variant={
+                selectedRecipeId === recipe.uuid ? "contained" : "outlined"
+              }
+              color="primary"
+              onClick={() => handleSelectRecipe(recipe.uuid)}
+              sx={{ mt: 2 }}
+            >
+              {selectedRecipeId === recipe.uuid
+                ? "Selected"
+                : "Select this recipe"}
+            </Button>
+          </Box>
         </Card>
       ))}
 
-      <Button
-        aria-label="recipes-page-back-btn"
-        variant="contained"
-        color="success"
-        sx={{ px: 4, py: 1.5, fontWeight: 500 }}
-        onClick={backToCookPage}
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Button
+          aria-label="recipes-page-back-btn"
+          variant="contained"
+          color="success"
+          sx={{ px: 4, py: 1.5, fontWeight: 500 }}
+          onClick={backToCookPage}
+        >
+          Back
+        </Button>
+
+        {selectedRecipeId && (
+          <Button
+            aria-label="confirm-selection-btn"
+            variant="contained"
+            color="secondary"
+            sx={{ px: 4, py: 1.5, fontWeight: 500 }}
+            onClick={handleConfirmSelection}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Saving..." : "Confirm"}
+          </Button>
+        )}
+      </Box>
+
+      {/* Error and success notifications */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
       >
-        Back
-      </Button>
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccess(false)}
+      >
+        <Alert severity="success" onClose={() => setShowSuccess(false)}>
+          Recipe saved to your history!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

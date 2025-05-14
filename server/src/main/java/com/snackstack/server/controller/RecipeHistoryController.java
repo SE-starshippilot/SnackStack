@@ -48,10 +48,10 @@ public class RecipeHistoryController implements Controller {
 
             post("", (req, res) -> {
                 var body = gson.fromJson(req.body(), HistoryRequest.class);
-                logger.info("Received request to add recipe {} to history for user {}", 
-                    body.recipeId(), body.userId());
+                logger.info("Received request to add recipe uuid {} to history for user {}",
+                    body.recipeUuid(), body.userId());
                 
-                int historyId = service.addToHistory(body.userId(), body.recipeId());
+                int historyId = service.addToHistory(body.userId(), body.recipeUuid());
                 res.status(201);
                 logger.info("Recipe added to history with ID: {}", historyId);
                 return gson.toJson(new IdResponse(historyId));
@@ -83,6 +83,6 @@ public class RecipeHistoryController implements Controller {
         logger.info("Recipe History API routes registered successfully");
     }
 
-    private record HistoryRequest(int userId, int recipeId) {}
+    private record HistoryRequest(int userId, String recipeUuid) {}
     private record IdResponse(int id) {}
 } 

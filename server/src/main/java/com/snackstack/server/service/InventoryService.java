@@ -1,11 +1,9 @@
 package com.snackstack.server.service;
 
 import com.snackstack.server.dao.IngredientDAO;
-import com.snackstack.server.dao.IngredientDAO;
 import com.snackstack.server.dao.InventoryDAO;
 import com.snackstack.server.dao.UserDAO;
 import com.snackstack.server.exceptions.RecordNotFound;
-import com.snackstack.server.model.InventoryItem;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;

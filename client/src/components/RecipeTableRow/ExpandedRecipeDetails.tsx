@@ -68,10 +68,10 @@ const ExpandedRecipeDetailsComponent: React.FC<ExpandedRecipeDetailsProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {recipe.recipe_ingredients.map((ingredient, index) => (
+            {recipe.recipeIngredients.map((ingredient, index) => (
               <TableRow key={index}>
                 <TableCell sx={{ width: TABLE_COLUMN_WIDTHS.ingredient }}>
-                  {ingredient.ingredient_name}
+                  {ingredient.ingredientName}
                   {ingredient.note && (
                     <span
                       style={{
@@ -108,7 +108,7 @@ const ExpandedRecipeDetailsComponent: React.FC<ExpandedRecipeDetailsProps> = ({
           Steps
         </Typography>
         <Box component="ol" sx={{ mt: 1, pl: 2, color: COLORS.text.primary }}>
-          {recipe.recipe_steps.map((step, index) => (
+          {recipe.recipeSteps.map((step, index) => (
             <li key={index} style={{ marginBottom: "8px" }}>
               {step}
             </li>

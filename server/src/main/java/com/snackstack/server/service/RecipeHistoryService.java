@@ -1,5 +1,6 @@
 package com.snackstack.server.service;
 
+import com.snackstack.server.dao.RecipeDAO;
 import com.snackstack.server.dao.RecipeHistoryDAO;
 import com.snackstack.server.dto.RecipeHistoryDTO;
 import com.snackstack.server.dto.IngredientDTO;
@@ -14,22 +15,31 @@ import org.slf4j.LoggerFactory;
 
 public class RecipeHistoryService {
     private final RecipeHistoryDAO dao;
+    private final RecipeDAO recipeDAO;
     private static final Logger logger = LoggerFactory.getLogger(RecipeHistoryService.class);
 
-    public RecipeHistoryService(RecipeHistoryDAO dao) {
+    public RecipeHistoryService(RecipeHistoryDAO dao, RecipeDAO recipeDAO) {
         this.dao = dao;
+        this.recipeDAO = recipeDAO;
         logger.debug("RecipeHistoryService initialized");
     }
 
-    public int addToHistory(int userId, int recipeId) {
+    public int addToHistory(int userId, String recipeUuid) {
         try {
-            logger.info("Adding recipe {} to history for user {}", recipeId, userId);
+            logger.info("Adding recipe with UUID {} to history for user {}", recipeUuid, userId);
+
+            // Fetch the recipe ID using the UUID
+            Integer recipeId = recipeDAO.getRecipeIdByUuid(recipeUuid);
+            if (recipeId == null) {
+                throw new RecordNotFound("Recipe not found with UUID: " + recipeUuid);
+            }
+
             Instant now = Instant.now();
             int historyId = dao.insertHistory(userId, recipeId, now);
             logger.info("Successfully added recipe to history with ID: {}", historyId);
             return historyId;
         } catch (Exception e) {
-            logger.error("Error adding recipe {} to history for user {}", recipeId, userId, e);
+            logger.error("Error adding recipe with UUID {} to history for user {}", recipeUuid, userId, e);
             throw e;
         }
     }
@@ -86,9 +96,9 @@ public class RecipeHistoryService {
         String searchTerm
     ) {
         try {
-            logger.info("Fetching recipe history for user: {} (offset={}, limit={}, favoriteOnly={}, search={}, sortAsc={})", 
+            logger.info("Fetching recipe history for user: {} (offset={}, limit={}, favoriteOnly={}, search={}, sortAsc={})",
                 userId, offset, limit, favoriteOnly, searchTerm, sortAsc);
-            
+
             List<RecipeHistoryDTO> items = dao.getHistoryByUserId(
                 userId, offset, limit, favoriteOnly, searchTerm, sortAsc
             );
@@ -118,4 +128,4 @@ public class RecipeHistoryService {
             throw e;
         }
     }
-} 
+}

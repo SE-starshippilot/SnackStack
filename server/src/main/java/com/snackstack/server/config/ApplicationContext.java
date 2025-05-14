@@ -72,7 +72,7 @@ public class ApplicationContext implements AutoCloseable {
     // Initialize services
     this.userService = new UserService(userDAO);
     this.inventoryService = new InventoryService(userDAO, inventoryDAO, ingredientDAO);
-    this.recipeHistoryService = new RecipeHistoryService(recipeHistoryDAO);
+    this.recipeHistoryService = new RecipeHistoryService(recipeHistoryDAO, recipeDAO);
     this.recipeService = new RecipeService(recipeGenerator, recipeDAO, recipeStepDAO, recipeIngredientDAO, ingredientDAO, inventoryDAO);
 
     // Initialize controllers

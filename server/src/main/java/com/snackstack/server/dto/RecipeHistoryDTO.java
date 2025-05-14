@@ -13,7 +13,7 @@ public record RecipeHistoryDTO(
     @ColumnName("recipeDescription") String recipeDescription,
     @ColumnName("createdAt") Instant createdAt,
     @ColumnName("isFavorite") boolean isFavorite,
-    List<String> recipeStep,
+    List<String> recipeSteps,
     List<IngredientDTO> recipeIngredients
 ) {
     @JdbiConstructor
