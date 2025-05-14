@@ -22,6 +22,18 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8080/api";
 
+// small generic hook
+function useDebounce<T>(value: T, delay = 400) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
+
+
+
 const buildQueryString = (params: Record<string, unknown>) =>
   Object.entries(params)
     .filter(([, v]) => v !== undefined && v !== null)
@@ -42,6 +54,8 @@ const HistoryRecipes: React.FC = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
+  const debouncedSearch = useDebounce(searchTerm, 400);
+
   /* request state -------------------------------------------------- */
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +75,7 @@ const HistoryRecipes: React.FC = () => {
         limit: rowsPerPage,
         sortAsc: sortOrder === "oldest",
         favoriteOnly: showFavoritesOnly,
-        keyword: searchTerm,
+        keyword: debouncedSearch,
       });
 
       const { data } = await axios.get<
@@ -105,7 +119,7 @@ const HistoryRecipes: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [dbUserId, page, rowsPerPage, sortOrder, showFavoritesOnly, searchTerm]);
+  }, [dbUserId, page, rowsPerPage, sortOrder, showFavoritesOnly, debouncedSearch]);
 
   useEffect(() => {
     fetchHistory();
