@@ -76,17 +76,18 @@ function RecipesPage() {
         setShowSuccess(true);
 
         // Navigate to details page after a short delay
-        setTimeout(() => {
-          navigate("/recipe-details", {
-            state: { recipe: selectedRecipe },
-          });
-        }, 1500);
+        // setTimeout(() => {
+        //   navigate("/recipe-details", {
+        //     state: { recipe: selectedRecipe },
+        //   });
+        // }, 1500);
       }
     } catch (err) {
+      setIsSubmitting(false)
       console.error("Error confirming recipe:", err);
       setError("Failed to save recipe to history. Please try again.");
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
     }
   };
 
@@ -190,7 +191,7 @@ function RecipesPage() {
             onClick={handleConfirmSelection}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Saving..." : "Confirm"}
+            {isSubmitting ? "Saved" : "Confirm"}
           </Button>
         )}
       </Box>
