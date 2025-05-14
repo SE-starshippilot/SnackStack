@@ -12,60 +12,32 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  JSXElementConstructor,
-  Key,
-  ReactElement,
-  ReactNode,
-  ReactPortal,
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useUserContext } from "../contexts/UserContext"; // Import the UserContext hook
 import type { Ingredient, Recipe, LocationState } from "../types/recipe";
-import { useUserContext } from "../contexts/UserContext";
+
+const API_URL = "http://localhost:8080/api/history";
 
 function RecipesPage() {
   const { state } = useLocation() as { state?: LocationState };
   const navigate = useNavigate();
+  const { dbUserId } = useUserContext(); // Get user ID from context
   const [recipes, setRecipes] = useState<Recipe[]>(state?.recipes ?? []);
-  const [selectedRecipeId, setSelectedRecipeId] = useState<string>('');
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { username, isProfileComplete } = useUserContext();
-  const [userId, setUserId] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  useEffect(() => {
-    if (username && isProfileComplete) {
-      fetchUserId();
-    }
-  }, [username, isProfileComplete]);
-
-  const fetchUserId = async () => {
-
-    try {
-      const res = await fetch(`http://localhost:8080/api/users/${encodeURIComponent(username)}/id`);
-
-      if (!res.ok) {
-        console.warn(`User not found: ${username}`);
-        return null;
-      }
-
-      const data = await res.json();
-      setUserId(data.id)
-    } catch (error) {
-      console.error("Error fetching user ID:", error);
-      return null;
-    }
-  };
-
-  /* If the page is refreshed there is no state – redirect user back */
   useEffect(() => {
     if (state?.recipes?.length) {
       setRecipes(state.recipes);
     } else {
-      // No recipes (e.g. page refresh or bad state) → send user back
       navigate("/cook", { replace: true });
     }
   }, [state, navigate]);
@@ -74,38 +46,47 @@ function RecipesPage() {
     navigate("/cook");
   };
 
-  const handleSelectRecipe = (recipeId: string) => {
-    setSelectedRecipeId(recipeId);
+  const handleSelectRecipe = (uuid: string) => {
+    setSelectedRecipeId(uuid);
   };
 
   const handleConfirmSelection = async () => {
+    if (!selectedRecipeId) return;
+
+    // Check if user is logged in
+    if (!dbUserId) {
+      setError("Please log in to save recipes to your history");
+      return;
+    }
+
     try {
-      console.log(selectedRecipeId);
-      console.log(userId);
+      setIsSubmitting(true);
+      setError(null);
 
-      const payload = {
-        userId: parseInt(userId, 10),
-        recipeId: parseInt(selectedRecipeId, 10)
-      };
-
-      const res = await fetch("http://localhost:8080/api/history", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload)
+      // Send request to add recipe to history using the user ID from context
+      await axios.post(API_URL, {
+        userId: dbUserId,
+        recipeUuid: selectedRecipeId,
       });
 
-      const data = await res.json();
-      if (data.id) {
-        const selected = recipes.find((r) => r.uuid === selectedRecipeId);
-        setRecipes(selected ? [selected] : []);
-        setIsSubmitting(true);
-      } else {
-        alert("Fail to confirm chosen recipe.");
+      // Filter to keep only the selected recipe
+      const selectedRecipe = recipes.find((r) => r.uuid === selectedRecipeId);
+      if (selectedRecipe) {
+        setRecipes([selectedRecipe]);
+        setShowSuccess(true);
+
+        // Navigate to details page after a short delay
+        setTimeout(() => {
+          navigate("/recipe-details", {
+            state: { recipe: selectedRecipe },
+          });
+        }, 1500);
       }
     } catch (err) {
       console.error("Error confirming recipe:", err);
+      setError("Failed to save recipe to history. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,11 +96,8 @@ function RecipesPage() {
         Your Generated Recipes
       </Typography>
 
-      {recipes.map((recipe, index) => (
-        <Card
-          key={index}
-          sx={{ mb: 4, boxShadow: 3 }}
-          data-testid={`recipe-card-${index}`}>
+      {recipes.map((recipe) => (
+        <Card key={recipe.uuid} sx={{ mb: 4, boxShadow: 3 }}>
           <CardContent>
             <Typography variant="h5" fontWeight={600}>
               {recipe.recipeName}
@@ -177,12 +155,16 @@ function RecipesPage() {
           </CardContent>
           <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
             <Button
-              variant={selectedRecipeId === recipe.uuid ? "contained" : "outlined"}
+              variant={
+                selectedRecipeId === recipe.uuid ? "contained" : "outlined"
+              }
               color="primary"
               onClick={() => handleSelectRecipe(recipe.uuid)}
               sx={{ mt: 2 }}
             >
-              {selectedRecipeId === recipe.uuid ? "Selected" : "Select this recipe"}
+              {selectedRecipeId === recipe.uuid
+                ? "Selected"
+                : "Select this recipe"}
             </Button>
           </Box>
         </Card>
@@ -208,11 +190,31 @@ function RecipesPage() {
             onClick={handleConfirmSelection}
             disabled={isSubmitting}
           >
-            Confirm
+            {isSubmitting ? "Saving..." : "Confirm"}
           </Button>
         )}
       </Box>
 
+      {/* Error and success notifications */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+      >
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccess(false)}
+      >
+        <Alert severity="success" onClose={() => setShowSuccess(false)}>
+          Recipe saved to your history!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

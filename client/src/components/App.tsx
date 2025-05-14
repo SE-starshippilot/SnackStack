@@ -7,7 +7,7 @@ import { Footer } from "./Footer";
 import Home from "./Home";
 import { Navbar } from "./Navbar";
 import RecipesPage from "../pages/RecipesPage";
-import HistoryRecipes from "../pages/HistoryRecipes";
+import HistoryRecipes from "../pages/RecipeHistory";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { UserProvider } from "../contexts/UserContext";
 

@@ -76,6 +76,14 @@ public interface RecipeDAO {
       """)
   Recipe getRecipeByUuid(@Bind("uuid") String uuid);
 
+  @SqlQuery("""
+      SELECT recipe_id                     AS id,
+             uuid
+        FROM recipes
+       WHERE uuid = :uuid
+      """)
+  Integer getRecipeIdByUuid(@Bind("uuid") String uuid);
+
 
   @SqlQuery("""
       SELECT recipe_id                     AS recipeId,

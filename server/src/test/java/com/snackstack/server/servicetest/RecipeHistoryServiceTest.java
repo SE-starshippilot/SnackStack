@@ -43,7 +43,7 @@ public class RecipeHistoryServiceTest {
   private IngredientDAO ingredientDAO;
 
   private int userId;
-  private int recipeId = 1;
+  private String recipeId;
 
   private final String sampleUserName = "Nim Telson";
   private final String sampleUserEmail = "nim@snackstack.com";
@@ -116,7 +116,7 @@ public class RecipeHistoryServiceTest {
     recipeDAO = jdbi.onDemand(RecipeDAO.class);
     ingredientDAO = jdbi.onDemand(IngredientDAO.class);
     historyDAO = jdbi.onDemand(RecipeHistoryDAO.class);
-    historyService = new RecipeHistoryService(historyDAO);
+    historyService = new RecipeHistoryService(historyDAO, recipeDAO);
     userService = new UserService(userDAO);
     recipeStepDAO = jdbi.onDemand(RecipeStepDAO.class);
     recipeIngredientDAO = jdbi.onDemand(RecipeIngredientDAO.class);
@@ -144,6 +144,8 @@ public class RecipeHistoryServiceTest {
     RecipeGenerationDTO recipeGenerationDTO = new RecipeGenerationDTO(availableIngredients, 1, recipeType, mealOrigin, allergies);
     recipeService.saveRecipe(recipeResponseDTO, recipeGenerationDTO);
 
+    recipeId = recipeResponseDTO.uuid();
+
     // history will be added in each test
   }
 
@@ -155,7 +157,7 @@ public class RecipeHistoryServiceTest {
 
     List<RecipeHistoryDTO> history = historyService.getUserRecipeHistory(userId, 0, 10, true, false, null);
     assertEquals(1, history.size());
-    assertEquals(recipeId, history.get(0).recipeId());
+    assertEquals(1, history.get(0).recipeId());
   }
 
   // test exist recipe
@@ -166,8 +168,8 @@ public class RecipeHistoryServiceTest {
     RecipeHistoryDTO dto = historyService.getHistoryEntry(historyId, userId);
     assertNotNull(dto);
     assertEquals("recipe_name", dto.recipeName());
-    assertEquals(1, dto.recipeStep().size());
-    assertEquals("step1", dto.recipeStep().get(0));
+    assertEquals(1, dto.recipeSteps().size());
+    assertEquals("step1", dto.recipeSteps().get(0));
     assertEquals(1, dto.recipeIngredients().size());
     assertEquals("ingredient1", dto.recipeIngredients().get(0).ingredientName());
   }

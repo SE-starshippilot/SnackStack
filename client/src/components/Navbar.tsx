@@ -26,10 +26,8 @@ export const Navbar = ({ disableAuth }: NavbarProps) => {
   return (
     <nav className="navbar">
       <div className="navbar-content">
-        {/* Left: your logo */}
         <div className="logo">Snack Stack</div>
 
-        {/* Right: everything else */}
         <div className="links-wrapper">
           <div className="nav-links">
             {navItems.map((item) => (
