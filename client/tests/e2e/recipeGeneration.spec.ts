@@ -1,7 +1,62 @@
 import { expect, test } from "@playwright/test";
+import { setupClerkTestingToken } from "@clerk/testing/playwright";
+const USER = process.env.E2E_CLERK_USER_USERNAME!;
+const PASS = process.env.E2E_CLERK_USER_PASSWORD!;
+const MOCK_USERNAME = "Cat";
+const MOCK_USER_ID = 123;
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("http://localhost:5173/cook");
+test.beforeEach(async ({ page, context }) => {
+  await context.clearCookies();
+  await page.addInitScript(() => localStorage.clear());
+  await setupClerkTestingToken({ page });
+  await page.route("**/api/users/email/*", (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        userId: MOCK_USER_ID,
+        email: USER,
+        userName: MOCK_USERNAME,
+        isProfileComplete: true,
+      }),
+    });
+  });
+
+  await page.route("**/api/users/exists/email/*", (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ id: 123 }),
+    });
+  });
+  // Go to the app and sign in
+  await page.goto("http://localhost:5173/");
+
+  // Open sign in dialog
+  await page.getByRole("button", { name: /^sign in$/i }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+
+  // Enter email
+  const emailInput = dialog.getByRole("textbox", { name: /email/i });
+  await expect(emailInput).toBeVisible();
+  await emailInput.fill(USER);
+  await emailInput.press("Enter");
+
+  // Enter password
+  const pwdInput = dialog.getByPlaceholder("Enter your password");
+  await expect(pwdInput).toBeVisible();
+  await pwdInput.fill(PASS);
+  await pwdInput.press("Enter");
+
+  // Since we're mocking the backend to say user exists,
+  // we should go straight to the home page (no profile completion)
+  await page.waitForURL("**/", { timeout: 5000 });
+
+  // Verify we're logged in
+  await expect(page.getByRole("button", { name: /^sign out$/i })).toBeVisible();
+
+  await page.getByRole("button", { name: "Find Recipes", exact: true }).click();
 });
 
 test("basic elements show on the recipe generation page", async ({ page }) => {
